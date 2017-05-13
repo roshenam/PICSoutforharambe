@@ -1,0 +1,4 @@
+/bin*
+*.scvd
+/proj/*.uvgui*
+/proj/*.uvopt
