@@ -78,8 +78,8 @@ void InitUART(void) {
 	HWREG(GPIO_PORTE_BASE + GPIO_O_AFSEL) |= (RX_PIN | TX_PIN);
 	
 	// 7. Configure PMC0-1 fields in GPIOPCTL to assign the UART to PE0-1
-	HWREG(GPIO_PORTE_BASE + GPIO_O_PCTL) |= 2<<(4*0);
-	HWREG(GPIO_PORTE_BASE + GPIO_O_PCTL) |= 2<<(4*1);
+	HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) =
+		(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xffffff00) + (1<<0*4) + (1<<1*4);
 	
 	// 8. Disable UART (clear UARTEN bit in UARTCTL)
 	HWREG(UART7_BASE + UART_O_CTL) &= ~UART_CTL_UARTEN;
@@ -136,8 +136,6 @@ void InitUART(void) {
 		ThisEvent.EventType = ES_BYTE_RECEIVED;
 		ThisEvent.EventParam = DataByte;
 		PostReceive_SM(ThisEvent);
-		
-		printf("received : %i\r\n", DataByte);
  	}
 
 	// else if TXMIS set (FIFO open): // where do we enable TXIM interrupts??? 
