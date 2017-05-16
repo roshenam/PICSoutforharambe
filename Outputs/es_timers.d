@@ -18,5 +18,7 @@
 .\outputs\es_timers.o: .\Headers\ES_Events.h
 .\outputs\es_timers.o: .\Headers\ES_Timers.h
 .\outputs\es_timers.o: .\Headers\ES_ServiceHeaders.h
-.\outputs\es_timers.o: .\Headers\TestHarnessService0.h
+.\outputs\es_timers.o: .\Headers\Comm_Service.h
+.\outputs\es_timers.o: .\Headers\Receive_SM.h
+.\outputs\es_timers.o: .\Headers\Transmit_SM.h
 .\outputs\es_timers.o: .\Headers\ES_LookupTables.h

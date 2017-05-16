@@ -20,4 +20,6 @@
 .\outputs\es_framework.o: .\Headers\ES_Queue.h
 .\outputs\es_framework.o: .\Headers\ES_LookupTables.h
 .\outputs\es_framework.o: .\Headers\ES_ServiceHeaders.h
-.\outputs\es_framework.o: .\Headers\TestHarnessService0.h
+.\outputs\es_framework.o: .\Headers\Comm_Service.h
+.\outputs\es_framework.o: .\Headers\Receive_SM.h
+.\outputs\es_framework.o: .\Headers\Transmit_SM.h
