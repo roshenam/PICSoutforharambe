@@ -188,7 +188,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 			}
 			
 			if ( ThisEvent.EventType == ES_BYTE_SENT) { // from UART ISR
-				printf("woohoo byte sent\r\n");
+				//printf("woohoo byte sent\r\n");
 				
 				// if index = length of array, we are done sending data
 				if (index == DataPacketLength) {

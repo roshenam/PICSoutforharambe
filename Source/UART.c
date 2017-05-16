@@ -78,23 +78,27 @@ void InitUART(void) {
 	HWREG(GPIO_PORTE_BASE + GPIO_O_AFSEL) |= (RX_PIN | TX_PIN);
 	
 	// 7. Configure PMC0-1 fields in GPIOPCTL to assign the UART to PE0-1
+	//HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) =
+	//	(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xffffff00) + (1<<0*4) + (1<<1*4);
+	HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) = 
+		(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xfffffff0) + (1<<0*4); //Rx pin 
 	HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) =
-		(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xffffff00) + (1<<0*4) + (1<<1*4);
+		(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xffffff0f) + (1<<1*4); //Tx pin
 	
 	// 8. Disable UART (clear UARTEN bit in UARTCTL)
 	HWREG(UART7_BASE + UART_O_CTL) &= ~UART_CTL_UARTEN;
 	
 	// 9. Write integer portion of BRD to UARTIBRD (Baud rate 9600, Integer = 260, Fraction = 27)
-	HWREG(UART7_BASE + UART_O_IBRD) = 0x0104;
+	HWREG(UART7_BASE + UART_O_IBRD) = 260; //0x0104;
 
 	// 10. Write fractional portion of BRD to UARTFBRD
-	HWREG(UART7_BASE + UART_O_FBRD) = 0x1B;
+	HWREG(UART7_BASE + UART_O_FBRD) = 27; //0x1B;
 	
 	// 11. Write desired serial parameters to UARTLCRH
 	HWREG(UART7_BASE + UART_O_LCRH) |= (BIT5HI | BIT6HI); // 8-bit word length, all other bits zero
 	
 	// 12. Configure UART operation using UARTCTL register 
-	HWREG(UART7_BASE + UART_O_CTL) |= (UART_CTL_RXE | UART_CTL_TXE | UART_CTL_EOT); // Enable Receive and Transmit
+	HWREG(UART7_BASE + UART_O_CTL) |= (UART_CTL_RXE | UART_CTL_TXE);// | UART_CTL_EOT); // Enable Receive and Transmit
 	
 	// 13. Enable UART by setting UARTEN bit in UARTCTL 
 	HWREG(UART7_BASE + UART_O_CTL) |= UART_CTL_UARTEN;
@@ -125,6 +129,7 @@ void InitUART(void) {
 
   // if RXMIS set:
  	if ((HWREG(UART7_BASE+UART_O_MIS) & UART_MIS_RXMIS) == UART_MIS_RXMIS) {
+		//printf("r\r\n");
 		// save new data byte
 		DataByte = HWREG(UART7_BASE + UART_O_DR); 
 
@@ -135,7 +140,7 @@ void InitUART(void) {
 		ES_Event ThisEvent;
 		ThisEvent.EventType = ES_BYTE_RECEIVED;
 		ThisEvent.EventParam = DataByte;
-		PostReceive_SM(ThisEvent);
+		PostReceive_SM(ThisEvent); 
  	}
 
 	// else if TXMIS set (FIFO open): // where do we enable TXIM interrupts??? 

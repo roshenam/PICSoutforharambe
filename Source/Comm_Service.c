@@ -151,7 +151,7 @@ static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t SizeOfData
 		DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_REQ_2_PAIR;
 		// dog tag ID 
 		DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x00; 
-		DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+2] = 0xAF;  // check sum (FF-running sum)
+		DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+2] = 0x51;  // check sum (FF-running sum)
 
 		ES_Event NewEvent;
 		NewEvent.EventType = ES_START_XMIT;

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Outputs\BaseTarget.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Outputs\BaseTarget.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Mon May 15 23:27:40 2017
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Tue May 16 13:16:05 2017
 <BR><P>
 <H3>Maximum Stack Usage =        160 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -33,21 +33,21 @@ Mutually Recursive functions
 <H3>
 Function Pointers
 </H3><UL>
- <LI><a href="#[14]">Check4Keystroke</a> from eventcheckers.o(i.Check4Keystroke) referenced from es_checkevents.o(.constdata)
+ <LI><a href="#[c]">Check4Keystroke</a> from eventcheckers.o(i.Check4Keystroke) referenced from es_checkevents.o(.constdata)
  <LI><a href="#[4]">FaultISR</a> from startup_rvmdk.o(RESET) referenced from startup_rvmdk.o(RESET)
- <LI><a href="#[c]">InitComm_Service</a> from comm_service.o(i.InitComm_Service) referenced from es_framework.o(.constdata)
- <LI><a href="#[12]">InitFARMER_SM</a> from farmer_sm.o(i.InitFARMER_SM) referenced from es_framework.o(.constdata)
- <LI><a href="#[e]">InitReceive_SM</a> from receive_sm.o(i.InitReceive_SM) referenced from es_framework.o(.constdata)
- <LI><a href="#[10]">InitTransmit_SM</a> from transmit_sm.o(i.InitTransmit_SM) referenced from es_framework.o(.constdata)
+ <LI><a href="#[d]">InitComm_Service</a> from comm_service.o(i.InitComm_Service) referenced from es_framework.o(.constdata)
+ <LI><a href="#[13]">InitFARMER_SM</a> from farmer_sm.o(i.InitFARMER_SM) referenced from es_framework.o(.constdata)
+ <LI><a href="#[f]">InitReceive_SM</a> from receive_sm.o(i.InitReceive_SM) referenced from es_framework.o(.constdata)
+ <LI><a href="#[11]">InitTransmit_SM</a> from transmit_sm.o(i.InitTransmit_SM) referenced from es_framework.o(.constdata)
  <LI><a href="#[5]">IntDefaultHandler</a> from startup_rvmdk.o(RESET) referenced 110 times from startup_rvmdk.o(RESET)
  <LI><a href="#[3]">NmiSR</a> from startup_rvmdk.o(RESET) referenced from startup_rvmdk.o(RESET)
  <LI><a href="#[15]">PostReceive_SM</a> from receive_sm.o(i.PostReceive_SM) referenced from es_timers.o(.constdata)
  <LI><a href="#[16]">PostTransmit_SM</a> from transmit_sm.o(i.PostTransmit_SM) referenced from es_timers.o(.constdata)
  <LI><a href="#[17]">Reset_Handler</a> from startup_rvmdk.o(RESET) referenced from startup_rvmdk.o(RESET)
- <LI><a href="#[d]">RunComm_Service</a> from comm_service.o(i.RunComm_Service) referenced from es_framework.o(.constdata)
- <LI><a href="#[13]">RunFARMER_SM</a> from farmer_sm.o(i.RunFARMER_SM) referenced from es_framework.o(.constdata)
- <LI><a href="#[f]">RunReceive_SM</a> from receive_sm.o(i.RunReceive_SM) referenced from es_framework.o(.constdata)
- <LI><a href="#[11]">RunTransmit_SM</a> from transmit_sm.o(i.RunTransmit_SM) referenced from es_framework.o(.constdata)
+ <LI><a href="#[e]">RunComm_Service</a> from comm_service.o(i.RunComm_Service) referenced from es_framework.o(.constdata)
+ <LI><a href="#[14]">RunFARMER_SM</a> from farmer_sm.o(i.RunFARMER_SM) referenced from es_framework.o(.constdata)
+ <LI><a href="#[10]">RunReceive_SM</a> from receive_sm.o(i.RunReceive_SM) referenced from es_framework.o(.constdata)
+ <LI><a href="#[12]">RunTransmit_SM</a> from transmit_sm.o(i.RunTransmit_SM) referenced from es_framework.o(.constdata)
  <LI><a href="#[8]">ShortTimerAHandler</a> from es_shorttimer.o(i.ShortTimerAHandler) referenced from startup_rvmdk.o(RESET)
  <LI><a href="#[9]">ShortTimerBHandler</a> from es_shorttimer.o(i.ShortTimerBHandler) referenced from startup_rvmdk.o(RESET)
  <LI><a href="#[6]">SysTickIntHandler</a> from es_port.o(i.SysTickIntHandler) referenced from startup_rvmdk.o(RESET)
@@ -251,14 +251,14 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_char_file
 </UL>
-<BR>[Called By]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendByte
-<LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunTransmit_SM
-<LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunReceive_SM
-<LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunFARMER_SM
-<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitTransmit_SM
-<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitReceive_SM
-<LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitFARMER_SM
-<LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunComm_Service
+<BR>[Called By]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunFARMER_SM
+<LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitFARMER_SM
+<LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunTransmit_SM
+<LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitTransmit_SM
+<LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendByte
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunReceive_SM
+<LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitReceive_SM
+<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunComm_Service
 <LI><a href="#[28]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -290,7 +290,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fgetc
 </UL>
-<BR>[Called By]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check4Keystroke
+<BR>[Called By]<UL><LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check4Keystroke
 </UL>
 
 <P><STRONG><a name="[36]"></a>puts</STRONG> (Thumb, 40 bytes, Stack size 8 bytes, puts.o(.text))
@@ -387,7 +387,7 @@ Global Symbols
 <LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_DeQueue
 </UL>
 
-<P><STRONG><a name="[14]"></a>Check4Keystroke</STRONG> (Thumb, 40 bytes, Stack size 8 bytes, eventcheckers.o(i.Check4Keystroke))
+<P><STRONG><a name="[c]"></a>Check4Keystroke</STRONG> (Thumb, 40 bytes, Stack size 8 bytes, eventcheckers.o(i.Check4Keystroke))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = Check4Keystroke &rArr; PostFARMER_SM &rArr; ES_PostToService &rArr; ES_EnQueueFIFO
 </UL>
 <BR>[Calls]<UL><LI><a href="#[3f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;kbhit
@@ -445,10 +445,10 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_EnQueueFIFO
 </UL>
-<BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostReceive_SM
-<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitTransmit_SM
-<LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitReceive_SM
-<LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitFARMER_SM
+<BR>[Called By]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitFARMER_SM
+<LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitTransmit_SM
+<LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostReceive_SM
+<LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitReceive_SM
 <LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostTransmit_SM
 <LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostComm_Service
 <LI><a href="#[9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ShortTimerBHandler
@@ -476,8 +476,8 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[57]"></a>ES_Timer_InitTimer</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, es_timers.o(i.ES_Timer_InitTimer))
-<BR><BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunTransmit_SM
-<LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunReceive_SM
+<BR><BR>[Called By]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunTransmit_SM
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunReceive_SM
 </UL>
 
 <P><STRONG><a name="[4f]"></a>ES_Timer_Tick_Resp</STRONG> (Thumb, 90 bytes, Stack size 16 bytes, es_timers.o(i.ES_Timer_Tick_Resp))
@@ -512,13 +512,13 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[58]"></a>GetDataPacket_Tx</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, comm_service.o(i.GetDataPacket_Tx))
-<BR><BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunTransmit_SM
+<BR><BR>[Called By]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunTransmit_SM
 </UL>
 
-<P><STRONG><a name="[c]"></a>InitComm_Service</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, comm_service.o(i.InitComm_Service))
+<P><STRONG><a name="[d]"></a>InitComm_Service</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, comm_service.o(i.InitComm_Service))
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[12]"></a>InitFARMER_SM</STRONG> (Thumb, 38 bytes, Stack size 16 bytes, farmer_sm.o(i.InitFARMER_SM))
+<P><STRONG><a name="[13]"></a>InitFARMER_SM</STRONG> (Thumb, 38 bytes, Stack size 16 bytes, farmer_sm.o(i.InitFARMER_SM))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
 <LI>Call Chain = InitFARMER_SM &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -527,7 +527,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[e]"></a>InitReceive_SM</STRONG> (Thumb, 42 bytes, Stack size 16 bytes, receive_sm.o(i.InitReceive_SM))
+<P><STRONG><a name="[f]"></a>InitReceive_SM</STRONG> (Thumb, 42 bytes, Stack size 16 bytes, receive_sm.o(i.InitReceive_SM))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
 <LI>Call Chain = InitReceive_SM &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -536,7 +536,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[10]"></a>InitTransmit_SM</STRONG> (Thumb, 38 bytes, Stack size 16 bytes, transmit_sm.o(i.InitTransmit_SM))
+<P><STRONG><a name="[11]"></a>InitTransmit_SM</STRONG> (Thumb, 38 bytes, Stack size 16 bytes, transmit_sm.o(i.InitTransmit_SM))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
 <LI>Call Chain = InitTransmit_SM &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -545,8 +545,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[56]"></a>InitUART</STRONG> (Thumb, 166 bytes, Stack size 0 bytes, uart.o(i.InitUART))
-<BR><BR>[Called By]<UL><LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunReceive_SM
+<P><STRONG><a name="[56]"></a>InitUART</STRONG> (Thumb, 176 bytes, Stack size 0 bytes, uart.o(i.InitUART))
+<BR><BR>[Called By]<UL><LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunReceive_SM
 </UL>
 
 <P><STRONG><a name="[53]"></a>IntMasterEnable</STRONG> (Thumb, 14 bytes, Stack size 8 bytes, interrupt.o(i.IntMasterEnable))
@@ -566,8 +566,8 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_PostToService
 </UL>
-<BR>[Called By]<UL><LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunReceive_SM
-<LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunFARMER_SM
+<BR>[Called By]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunFARMER_SM
+<LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunReceive_SM
 </UL>
 
 <P><STRONG><a name="[40]"></a>PostFARMER_SM</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, farmer_sm.o(i.PostFARMER_SM))
@@ -575,7 +575,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_PostToService
 </UL>
-<BR>[Called By]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check4Keystroke
+<BR>[Called By]<UL><LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check4Keystroke
 </UL>
 
 <P><STRONG><a name="[15]"></a>PostReceive_SM</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, receive_sm.o(i.PostReceive_SM))
@@ -597,7 +597,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_timers.o(.constdata)
 </UL>
-<P><STRONG><a name="[d]"></a>RunComm_Service</STRONG> (Thumb, 40 bytes, Stack size 16 bytes, comm_service.o(i.RunComm_Service))
+<P><STRONG><a name="[e]"></a>RunComm_Service</STRONG> (Thumb, 40 bytes, Stack size 16 bytes, comm_service.o(i.RunComm_Service))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
 <LI>Call Chain = RunComm_Service &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -606,7 +606,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[13]"></a>RunFARMER_SM</STRONG> (Thumb, 72 bytes, Stack size 8 bytes, farmer_sm.o(i.RunFARMER_SM))
+<P><STRONG><a name="[14]"></a>RunFARMER_SM</STRONG> (Thumb, 72 bytes, Stack size 8 bytes, farmer_sm.o(i.RunFARMER_SM))
 <BR><BR>[Stack]<UL><LI>Max Depth = 136 + Unknown Stack Size
 <LI>Call Chain = RunFARMER_SM &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -615,7 +615,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[f]"></a>RunReceive_SM</STRONG> (Thumb, 248 bytes, Stack size 32 bytes, receive_sm.o(i.RunReceive_SM))
+<P><STRONG><a name="[10]"></a>RunReceive_SM</STRONG> (Thumb, 258 bytes, Stack size 32 bytes, receive_sm.o(i.RunReceive_SM))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160 + Unknown Stack Size
 <LI>Call Chain = RunReceive_SM &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -626,8 +626,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[11]"></a>RunTransmit_SM</STRONG> (Thumb, 170 bytes, Stack size 24 bytes, transmit_sm.o(i.RunTransmit_SM))
-<BR><BR>[Stack]<UL><LI>Max Depth = 152 + Unknown Stack Size
+<P><STRONG><a name="[12]"></a>RunTransmit_SM</STRONG> (Thumb, 160 bytes, Stack size 16 bytes, transmit_sm.o(i.RunTransmit_SM))
+<BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
 <LI>Call Chain = RunTransmit_SM &rArr; SendByte &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendByte
@@ -791,7 +791,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> _printf_char_file.o(.text)
 </UL>
 <P><STRONG><a name="[3f]"></a>kbhit</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, termio.o(i.kbhit))
-<BR><BR>[Called By]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check4Keystroke
+<BR><BR>[Called By]<UL><LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check4Keystroke
 </UL>
 
 <P><STRONG><a name="[28]"></a>main</STRONG> (Thumb, 108 bytes, Stack size 0 bytes, main.o(i.main))
@@ -819,12 +819,12 @@ Global Symbols
 <H3>
 Local Symbols
 </H3>
-<P><STRONG><a name="[41]"></a>ConstructPacket</STRONG> (Thumb, 58 bytes, Stack size 8 bytes, comm_service.o(i.ConstructPacket))
+<P><STRONG><a name="[41]"></a>ConstructPacket</STRONG> (Thumb, 56 bytes, Stack size 8 bytes, comm_service.o(i.ConstructPacket))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = ConstructPacket &rArr; PostTransmit_SM &rArr; ES_PostToService &rArr; ES_EnQueueFIFO
 </UL>
 <BR>[Calls]<UL><LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostTransmit_SM
 </UL>
-<BR>[Called By]<UL><LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunComm_Service
+<BR>[Called By]<UL><LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunComm_Service
 </UL>
 
 <P><STRONG><a name="[59]"></a>SendByte</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, transmit_sm.o(i.SendByte))
@@ -833,7 +833,7 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
-<BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunTransmit_SM
+<BR>[Called By]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunTransmit_SM
 </UL>
 
 <P><STRONG><a name="[3]"></a>NmiSR</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup_rvmdk.o(RESET))

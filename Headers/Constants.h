@@ -37,7 +37,7 @@
 #define FARMER_DOG_RESET_ENCR     0x05
 
 //Data Packet Array
-#define FRAME_ID                  0x02
+#define FRAME_ID                  0x01
 #define API_IDENTIFIER_Tx         0x01
 #define API_IDENTIFIER_Rx         0x81
 #define API_IDENTIFIER_Tx_Result  0x89
