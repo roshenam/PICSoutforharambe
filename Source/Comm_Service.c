@@ -174,7 +174,7 @@ static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t SizeOfData
    Sarah Cabreros
 ****************************************************************************/
 static void InterpretPacket(uint8_t SizeOfData) {
-	
+	/** TESTING CHECKPOINT1: will receive a */
 }
 
 

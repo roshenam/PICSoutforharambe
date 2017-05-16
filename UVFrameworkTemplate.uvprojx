@@ -426,16 +426,127 @@
               <FileName>TestHarnessService0.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\TestHarnessService0.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>2</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <useXO>2</useXO>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>TemplateFSM.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\TemplateFSM.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>2</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <useXO>2</useXO>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>ES_ShortTimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Source\ES_ShortTimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>Comm_Service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\Comm_Service.c</FilePath>
+            </File>
+            <File>
+              <FileName>Receive_SM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\Receive_SM.c</FilePath>
+            </File>
+            <File>
+              <FileName>Transmit_SM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\Transmit_SM.c</FilePath>
+            </File>
+            <File>
+              <FileName>UART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\UART.c</FilePath>
+            </File>
+            <File>
+              <FileName>FARMER_SM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\FARMER_SM.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -546,6 +657,41 @@
               <FileName>ES_ShortTimer.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\ES_ShortTimer.h</FilePath>
+            </File>
+            <File>
+              <FileName>Comm_Service.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Comm_Service.h</FilePath>
+            </File>
+            <File>
+              <FileName>Constants.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Constants.h</FilePath>
+            </File>
+            <File>
+              <FileName>FARMER_SM.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\FARMER_SM.h</FilePath>
+            </File>
+            <File>
+              <FileName>Hardware.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Hardware.h</FilePath>
+            </File>
+            <File>
+              <FileName>Receive_SM.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Receive_SM.h</FilePath>
+            </File>
+            <File>
+              <FileName>Transmit_SM.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Transmit_SM.h</FilePath>
+            </File>
+            <File>
+              <FileName>UART.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\UART.h</FilePath>
             </File>
           </Files>
         </Group>
