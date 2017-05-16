@@ -128,8 +128,13 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
     case FarmerUnpaired:      
  
 			if ( ThisEvent.EventType == ES_NEW_KEY && ThisEvent.EventParam == 'd') {
-				// send some shit 
+				printf("d\r\n");
 				
+				// send some shit 
+				ES_Event NewEvent;
+				NewEvent.EventType = ES_SENDPACKET;
+				NewEvent.EventParam = 11; // size of data packet
+				PostComm_Service(NewEvent);
 			}
       
     break;

@@ -8,6 +8,7 @@
 .\outputs\eventcheckers.o: .\Headers\Comm_Service.h
 .\outputs\eventcheckers.o: .\Headers\Receive_SM.h
 .\outputs\eventcheckers.o: .\Headers\Transmit_SM.h
+.\outputs\eventcheckers.o: .\Headers\FARMER_SM.h
 .\outputs\eventcheckers.o: .\Headers\ES_Port.h
 .\outputs\eventcheckers.o: C:\Keil_v5\ARM\ARMCC\bin\..\include\stdio.h
 .\outputs\eventcheckers.o: .\Headers\termio.h
@@ -17,4 +18,3 @@
 .\outputs\eventcheckers.o: .\Headers\bitdefs.h
 .\outputs\eventcheckers.o: .\Headers\Bin_Const.h
 .\outputs\eventcheckers.o: .\Headers\EventCheckers.h
-.\outputs\eventcheckers.o: .\Headers\FARMER_SM.h

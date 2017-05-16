@@ -23,3 +23,4 @@
 .\outputs\es_framework.o: .\Headers\Comm_Service.h
 .\outputs\es_framework.o: .\Headers\Receive_SM.h
 .\outputs\es_framework.o: .\Headers\Transmit_SM.h
+.\outputs\es_framework.o: .\Headers\FARMER_SM.h

@@ -21,4 +21,5 @@
 .\outputs\es_timers.o: .\Headers\Comm_Service.h
 .\outputs\es_timers.o: .\Headers\Receive_SM.h
 .\outputs\es_timers.o: .\Headers\Transmit_SM.h
+.\outputs\es_timers.o: .\Headers\FARMER_SM.h
 .\outputs\es_timers.o: .\Headers\ES_LookupTables.h

@@ -114,6 +114,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 	} 
 	
 	if (ThisEvent.EventType == ES_SENDPACKET ) {
+			printf("boutta send some shiiiittt \r\n");
 			// call ConstructPacket
 			uint8_t PacketLength = ThisEvent.EventParam;
 			ConstructPacket(0x20, 0x8B, PacketLength);

@@ -18,3 +18,4 @@
 .\outputs\es_postlist.o: .\Headers\Comm_Service.h
 .\outputs\es_postlist.o: .\Headers\Receive_SM.h
 .\outputs\es_postlist.o: .\Headers\Transmit_SM.h
+.\outputs\es_postlist.o: .\Headers\FARMER_SM.h

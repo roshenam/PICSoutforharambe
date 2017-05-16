@@ -100,10 +100,10 @@ void InitUART(void) {
 	HWREG(UART7_BASE + UART_O_CTL) |= UART_CTL_UARTEN;
 
 	// locally enable RX interrupts
-	HWREG(UART7_BASE + UART_O_CTL) |= UART_CTL_RXE;
+	HWREG(UART7_BASE + UART_O_IM) |= UART_IM_RXIM; 
 	
 	// set NVIC enable for UART7
-	HWREG(NVIC_EN0) |= BIT6HI;
+	HWREG(NVIC_EN1) |= BIT31HI;
 	
 	// globally enable interrupts 
 	__enable_irq();
@@ -122,8 +122,8 @@ void InitUART(void) {
 ****************************************************************************/
 
  void UART_ISR(void) {
-	// read UARTMIS
-    // if RXMIS set:
+
+  // if RXMIS set:
  	if ((HWREG(UART7_BASE+UART_O_MIS) & UART_MIS_RXMIS) == UART_MIS_RXMIS) {
 		// save new data byte
 		DataByte = HWREG(UART7_BASE + UART_O_DR); 
@@ -136,6 +136,8 @@ void InitUART(void) {
 		ThisEvent.EventType = ES_BYTE_RECEIVED;
 		ThisEvent.EventParam = DataByte;
 		PostReceive_SM(ThisEvent);
+		
+		printf("received : %i\r\n", DataByte);
  	}
 
 	// else if TXMIS set (FIFO open): // where do we enable TXIM interrupts??? 
@@ -151,7 +153,7 @@ void InitUART(void) {
 		PostTransmit_SM(ThisEvent);
 		
 		// if this was last byte in message block
-		if (IsLastByte()) { // isLastByte from Transmit_SM
+		if (IsLastByte()) { // IsLastByte from Transmit_SM
 			// disable TXIM 
 			HWREG(UART7_BASE + UART_O_IM) &= ~UART_IM_TXIM;
 		}

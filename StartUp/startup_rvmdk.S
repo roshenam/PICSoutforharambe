@@ -81,6 +81,7 @@ __heap_limit
         EXTERN  SysTickIntHandler
         EXTERN  ShortTimerAHandler
         EXTERN  ShortTimerBHandler
+		EXTERN  UART_ISR
 ;        EXTERN  UARTStdioIntHandler
 
 ;******************************************************************************
@@ -169,7 +170,7 @@ __Vectors
         DCD     IntDefaultHandler           ; UART4 Rx and Tx
         DCD     IntDefaultHandler           ; UART5 Rx and Tx
         DCD     IntDefaultHandler           ; UART6 Rx and Tx
-        DCD     IntDefaultHandler           ; UART7 Rx and Tx
+        DCD     UART_ISR           ; UART7 Rx and Tx
         DCD     0                           ; Reserved
         DCD     0                           ; Reserved
         DCD     0                           ; Reserved

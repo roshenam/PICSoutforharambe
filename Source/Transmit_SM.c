@@ -157,6 +157,8 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
     case Idle:      
 			// waiting to receive Start_Xmit event from Comm_Service
 			if ( ThisEvent.EventType == ES_START_XMIT ) {
+				printf("start xmit \r\n");
+				
 				// get length of array 
 				DataPacketLength = ThisEvent.EventParam; 
 				
@@ -186,6 +188,8 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 			}
 			
 			if ( ThisEvent.EventType == ES_BYTE_SENT) { // from UART ISR
+				printf("woohoo byte sent\r\n");
+				
 				// if index = length of array, we are done sending data
 				if (index == DataPacketLength) {
 					// set LastByteFlag
@@ -200,7 +204,8 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 					// send next byte of array 
 					uint8_t CurrentByte = *(DataToSend+index);
 					SendByte(CurrentByte);
-
+					
+					
 					// increment index 
 					index++;
 
@@ -223,6 +228,7 @@ static void SendByte(uint8_t DataByte) {
 	if((HWREG(UART7_BASE + UART_O_FR)&UART_FR_TXFE) != 0){
 		// write data to DR 
 		HWREG(UART7_BASE + UART_O_DR) = DataByte; 
+		printf("Sending byte: %i\r\n", DataByte);
 	}else{
 		printf("Fifo not empty\r\n");
 	}	
