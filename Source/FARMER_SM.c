@@ -19,6 +19,8 @@
 #include "Hardware.h"
 #include "FARMER_SM.h"
 
+#include "Accelerometers.h"
+
 /*----------------------------- Module Defines ----------------------------*/
 
 
@@ -58,6 +60,9 @@ bool InitFARMER_SM ( uint8_t Priority )
   MyPriority = Priority;
   // put us into the Initial PseudoState
   CurrentState = InitFARMER;
+	
+	// initialize sensors
+	Init_Accel();
 	
   // post the initial transition event
   ThisEvent.EventType = ES_INIT;
@@ -136,7 +141,14 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				NewEvent.EventParam = 11; // size of data packet
 				PostComm_Service(NewEvent);
 			}
+			
+			if( ThisEvent.EventType == ES_NEW_KEY && ThisEvent.EventParam == 'f') {
+				uint32_t FB = Get_AccelFB();
+			}
       
+			if( ThisEvent.EventType == ES_NEW_KEY && ThisEvent.EventParam == 'r') {
+				uint32_t RL = Get_AccelRL();
+			}
     break;
 
 		case FarmerPaired:      
