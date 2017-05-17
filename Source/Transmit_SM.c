@@ -146,9 +146,6 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
             // set index to zero
             index = 0; 
 
-            // clear LastByteFlag
-            LastByteFlag = 0;
-
             // get pointer to array of message
             DataToSend = GetDataPacket_Tx(); // function from Comm_Service
          }
@@ -158,6 +155,9 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 			// waiting to receive Start_Xmit event from Comm_Service
 			if ( ThisEvent.EventType == ES_START_XMIT ) {
 				printf("start xmit \r\n");
+				
+				// clear LastByteFlag
+        LastByteFlag = 0;
 				
 				// get length of array 
 				DataPacketLength = ThisEvent.EventParam; 
