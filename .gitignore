@@ -11,5 +11,6 @@
 /Outputs/*.map
 /Outputs/*.htm
 /Outputs/*.bin
+/Outputs/*.sct
 /*.dep
 
