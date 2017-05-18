@@ -262,11 +262,10 @@ typedef enum {  ES_NO_EVENT = 0,
 								ES_BYTE_RECEIVED, ES_DATAPACKET_RECEIVED,
 								// Comm_Service
 								ES_SENDPACKET,
-								//received messages
+								// FARMER_SM received messages
 								ES_DOG_REPORT_RECEIVED, ES_DOG_ACK_RECEIVED, ES_DOG_RESET_ENCR_RECEIVED,
-								//Farmer_SM
-								ES_UNPAIR
-
+								//FARMER_SM pairing/unpairing requests
+								ES_UNPAIR, ES_PAIR
 				} ES_EventTyp_t ;
 
 /****************************************************************************/
@@ -317,8 +316,8 @@ typedef enum {  ES_NO_EVENT = 0,
 #define TIMER0_RESP_FUNC PostReceive_SM
 #define TIMER1_RESP_FUNC TIMER_UNUSED
 #define TIMER2_RESP_FUNC PostTransmit_SM
-#define TIMER3_RESP_FUNC TIMER_UNUSED
-#define TIMER4_RESP_FUNC TIMER_UNUSED
+#define TIMER3_RESP_FUNC PostFARMER_SM
+#define TIMER4_RESP_FUNC PostFARMER_SM
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
@@ -341,5 +340,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define RECEIVE_TIMER 0
 //#define GameTimer 1
 #define TRANSMIT_TIMER 2
+#define INTER_MESSAGE_TIMER 3
+#define LOST_COMM_TIMER	4
 
 #endif /* CONFIGURE_H */

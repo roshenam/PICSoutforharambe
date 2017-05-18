@@ -63,11 +63,23 @@ bool Check4Keystroke(void)
 {
   if ( IsNewKeyReady() ) // new key waiting?
   {
-    ES_Event ThisEvent;
-    ThisEvent.EventType = ES_NEW_KEY;
-    ThisEvent.EventParam = GetNewKey();
-
-    PostFARMER_SM( ThisEvent );
+    
+		//ES_Event ThisEvent;
+    //ThisEvent.EventType = ES_NEW_KEY;
+    //ThisEvent.EventParam = GetNewKey();
+    //PostFARMER_SM( ThisEvent );
+		
+		if (GetNewKey() == 'd' || GetNewKey() == 'D') {
+			ES_Event ThisEvent;
+			ThisEvent.EventType = ES_PAIR;
+			PostFARMER_SM(ThisEvent);
+		}
+		
+		if (GetNewKey() == 'u' || GetNewKey() == 'U') {
+			ES_Event ThisEvent;
+			ThisEvent.EventType = ES_UNPAIR;
+			PostFARMER_SM(ThisEvent);
+		}
     
     return true;
   }

@@ -5,7 +5,7 @@
 #include "ES_Types.h"
 #include "ES_Events.h"
 
-typedef enum {InitFARMER, FarmerUnpaired, FarmerPaired} FARMERState_t ;
+typedef enum {InitFARMER, Wait2Pair, Wait4PairResponse, Paired} FARMERState_t ;
 
 bool InitFARMER_SM ( uint8_t Priority );
 bool PostFARMER_SM( ES_Event ThisEvent );

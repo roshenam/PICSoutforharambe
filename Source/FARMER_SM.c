@@ -116,9 +116,10 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
 	
 	if (ThisEvent.EventType == ES_UNPAIR) {
+		printf("UNPAIRED\r\n");
 		//if there is ever a place where we want to unpair, send this event to farmer_sm
 		//most likeley for debugging - add in a key-press event that sends this event
-		CurrentState = FarmerUnpaired;
+		CurrentState = Wait2Pair;
 	}
 
   switch ( CurrentState )
@@ -126,30 +127,85 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
     case InitFARMER :       
         if ( ThisEvent.EventType == ES_INIT )// only respond to ES_Init
         {
-            // set current state to FarmerUnpaired
-            CurrentState = FarmerUnpaired;
+            // set current state to Wait2Pair
+            CurrentState = Wait2Pair;
          }
     break;
 
-    case FarmerUnpaired:      
+    case Wait2Pair:      
  
-			if ( ThisEvent.EventType == ES_NEW_KEY && ThisEvent.EventParam == 'd') {
-				printf("d\r\n");
+			if ( ThisEvent.EventType == ES_PAIR) {
+				printf("PAIRED\r\n");
 				
-				// send some shit 
+				// EventParam should be DOG_TAG number? (0x01, 0x02, or 0x03) or do we need to know DOG_TAG here?
+				
+				// send a REQ2PAIR packet 
 				ES_Event NewEvent;
 				NewEvent.EventType = ES_SENDPACKET;
 				NewEvent.EventParam = FARMER_DOG_REQ_2_PAIR; // type of data packet to construct
 				PostComm_Service(NewEvent);
+				
+				// start LOST_COMM timer
+				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
 			}
       
     break;
 
-		case FarmerPaired:      
-
+		case Wait4PairResponse:      
+			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
+				// go back to Wait2Pair state
+				CurrentState = Wait2Pair;
+			}
+			
+			if (ThisEvent.EventType == ES_DOG_ACK_RECEIVED ) {
+				// send an ENCR_KEY packet 
+				ES_Event NewEvent;
+				NewEvent.EventType = ES_SENDPACKET;
+				NewEvent.EventParam = FARMER_DOG_ENCR_KEY;
+				PostComm_Service(NewEvent);
+				
+				// start LOST_COMM timer
+				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
+				
+				// start INTER_MESSAGE timer
+				ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
+				
+				// go to Paired state
+				CurrentState = Paired;
+			}
 		
     break;
+
+		case Paired:      
+			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
+				// go back to Wait2Pair state
+				CurrentState = Wait2Pair;
+			}
+			
+			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == INTER_MESSAGE_TIMER ) {
+				// send a CTRL packet
+				ES_Event NewEvent;
+				NewEvent.EventType = ES_SENDPACKET;
+				NewEvent.EventParam = FARMER_DOG_CTRL;
+				PostComm_Service(NewEvent);		
+
+				// start inter message timer
+				ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
+			}
+			
+			if ( ThisEvent.EventType == ES_DOG_REPORT_RECEIVED ) {
+				// start LOST_COMM timer
+				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
+			}
+			
+			if ( ThisEvent.EventType == ES_DOG_RESET_ENCR_RECEIVED ) {
+				// reset encryption index to zero 
+				
+				// start LOST_COMM timer
+				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
+			}
 		
+    break;		
 		
     default :
       ;
