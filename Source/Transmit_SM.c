@@ -29,6 +29,7 @@
 #include "Transmit_SM.h"
 #include "Receive_SM.h"
 #include "UART.h"
+#include "Constants.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define TRANSMIT_TIMER_LENGTH 10 // based off of 9600 baud rate (each character takes ~1.04ms to send)
@@ -154,17 +155,17 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
     case Idle:      
 			// waiting to receive Start_Xmit event from Comm_Service
 			if ( ThisEvent.EventType == ES_START_XMIT ) {
-				printf("start xmit \r\n");
 				
 				// clear LastByteFlag
         LastByteFlag = 0;
 				
 				// get length of array 
-				DataPacketLength = ThisEvent.EventParam; 
+				DataPacketLength = ThisEvent.EventParam /*framelength*/ + HEADER_LENGTH + 1 /*checksum bit*/; 
 				
 				// send first byte of array 
 				uint8_t CurrentByte = *(DataToSend+index);
 				SendByte(CurrentByte);
+				printf("start xmit: %i\n\r ", CurrentByte);
 
 				// increment index 
 				index++;
@@ -192,6 +193,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 				
 				// if index = length of array, we are done sending data
 				if (index == DataPacketLength) {
+					printf("sent all bytes \n\r");
 					// set LastByteFlag
 					LastByteFlag = 1;
 
@@ -204,7 +206,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 					// send next byte of array 
 					uint8_t CurrentByte = *(DataToSend+index);
 					SendByte(CurrentByte);
-					
+					printf("xmit data: %i\n\r", CurrentByte);
 					
 					// increment index 
 					index++;

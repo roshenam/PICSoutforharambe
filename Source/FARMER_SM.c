@@ -114,6 +114,12 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 {
   ES_Event ReturnEvent;
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
+	
+	if (ThisEvent.EventType == ES_UNPAIR) {
+		//if there is ever a place where we want to unpair, send this event to farmer_sm
+		//most likeley for debugging - add in a key-press event that sends this event
+		CurrentState = FarmerUnpaired;
+	}
 
   switch ( CurrentState )
   {
@@ -133,7 +139,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				// send some shit 
 				ES_Event NewEvent;
 				NewEvent.EventType = ES_SENDPACKET;
-				NewEvent.EventParam = 11; // size of data packet
+				NewEvent.EventParam = FARMER_DOG_REQ_2_PAIR; // type of data packet to construct
 				PostComm_Service(NewEvent);
 			}
       

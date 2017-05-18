@@ -20,13 +20,15 @@
 #include "Hardware.h"
 #include "Constants.h"
 #include "Transmit_SM.h"
+#include "FARMER_SM.h"
+
 
 /*----------------------------- Module Defines ----------------------------*/
 
 
 
 /*---------------------------- Module Functions ---------------------------*/
-static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t SizeOfData);
+static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType);
 static void InterpretPacket(uint8_t SizeOfData); 
 
 /*---------------------------- Module Variables ---------------------------*/
@@ -116,8 +118,8 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 	if (ThisEvent.EventType == ES_SENDPACKET ) {
 			printf("boutta send some shiiiittt \r\n");
 			// call ConstructPacket
-			uint8_t PacketLength = ThisEvent.EventParam;
-			ConstructPacket(0x20, 0x8B, PacketLength);
+			uint8_t PacketType = ThisEvent.EventParam;
+			ConstructPacket(0x20, 0x8B, PacketType);
 
 	}
 
@@ -137,27 +139,62 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
  Author
    Sarah Cabreros
 ****************************************************************************/
-static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t SizeOfData) {
-		DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER;
-		DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00;
-		DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = 0x07;
-		DataPacket_Tx[API_IDENT_BYTE_INDEX_TX] = API_IDENTIFIER_Tx;
-		DataPacket_Tx[FRAME_ID_BYTE_INDEX] = FRAME_ID;
-		//uint8_t PairedFarmer_MSB = GetPairedFarmerMSB();
-		DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = DestMSB; //PairedFarmer_MSB;
-		//uint8_t PairedFarmer_LSB = GetPairedFarmerLSB();
-		DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = DestLSB; //PairedFarmer_LSB;
-		DataPacket_Tx[OPTIONS_BYTE_INDEX_TX] = 0x00;
-		DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_REQ_2_PAIR;
-		// dog tag ID 
-		DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x00; 
-		DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+2] = 0x51;  // check sum (FF-running sum)
-
-		ES_Event NewEvent;
-		NewEvent.EventType = ES_START_XMIT;
-		NewEvent.EventParam = 11; //param is length of data packet
-		//Post NewEvent to transmit service
-		PostTransmit_SM(NewEvent); 
+static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType) {
+		printf("--------------CONSTRUCTING-----------\n\r");
+					ES_Event NewEvent;
+					//Header Construction
+					printf("Constructing Datapacket (Comm_Service) \n\r");
+					DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER;
+					DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00; 
+					DataPacket_Tx[API_IDENT_BYTE_INDEX_TX] = API_IDENTIFIER_Tx;
+					DataPacket_Tx[FRAME_ID_BYTE_INDEX] = FRAME_ID;
+					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = DestMSB; 
+					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = DestLSB; 
+					DataPacket_Tx[OPTIONS_BYTE_INDEX_TX] = OPTIONS;
+					switch (PacketType) {
+						case FARMER_DOG_REQ_2_PAIR:
+							printf("Req 2 Pair Construction (Comm Service) \n\r");
+						  /*************REDO ALL VALUES HERE************/
+							//add the unique frame length
+							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = 7;
+							//add the packet type
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_REQ_2_PAIR;
+							//ADD DATA
+							// add check sum
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x4F;
+						  //set the frame length as event param
+							NewEvent.EventParam = 7;						
+							break;
+						case FARMER_DOG_ENCR_KEY:
+							/*************REDO ALL VALUES HERE************/
+							printf("Encryption Key Construction (Comm Service) \n\r");
+							//add the unique frame length
+							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = 7;
+							//add the packet type
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_ENCR_KEY;
+							// add check sum
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x4F;
+						  //set the frame length as event param
+							NewEvent.EventParam = 7;	
+							break;
+						case FARMER_DOG_CTRL:
+							/*************REDO ALL VALUES HERE************/
+							printf("Farmer Control Construction \n\r");
+								//add the unique frame length
+							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = 7;
+							//add the packet type
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_CTRL;
+							//add in data from IMU SERVICE
+							// add check sum
+							//DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+13] = ???; NEED TO CALCULATE THE CHECKSUM CORRECTLY!!!
+						  //set the frame length as event param
+							NewEvent.EventParam = 7;	
+							break;
+					}
+		
+					NewEvent.EventType = ES_START_XMIT;
+					//Post NewEvent to transmit service
+					PostTransmit_SM(NewEvent);
 }
 
 /****************************************************************************
@@ -174,7 +211,37 @@ static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t SizeOfData
    Sarah Cabreros
 ****************************************************************************/
 static void InterpretPacket(uint8_t SizeOfData) {
-	/** TESTING CHECKPOINT1: will receive a */
+	DataPacket_Rx	= GetDataPacket();
+	uint8_t API_Ident = *(DataPacket_Rx + API_IDENT_BYTE_INDEX_RX);
+	if (API_Ident == API_IDENTIFIER_Rx) {
+			printf("RECEIVED A DATAPACKET (Comm_Service) \n\r");
+			ES_Event NewEvent;
+			uint8_t PacketType = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX);
+			switch (PacketType) {
+				case DOG_FARMER_REPORT :
+					NewEvent.EventType = ES_DOG_REPORT_RECEIVED;
+					break;
+				case DOG_ACK :
+					NewEvent.EventType = ES_DOG_ACK_RECEIVED;
+					break;
+				case DOG_FARMER_RESET_ENCR :
+					NewEvent.EventType = ES_DOG_RESET_ENCR_RECEIVED;
+					break;
+			}
+			NewEvent.EventParam = SizeOfData; //the frame length
+			PostFARMER_SM(NewEvent);
+		} else if (API_Ident == API_IDENTIFIER_Tx_Result) { 
+			printf("RECEIVED A TRANSMISSION RESULT DATAPACKET (Comm_Service): ");
+			uint8_t TxStatusResult = *(DataPacket_Rx + TX_STATUS_BYTE_INDEX);
+			if (TxStatusResult == SUCCESS) {
+				printf("SUCCESS\n\r");
+			} else {
+				printf("FAILURE\n\r");
+				//RESEND THE TX DATA PACKET -- ADD CODE IN HERE
+			}
+		} else if (API_Ident == API_IDENTIFIER_Reset) {
+			printf("Hardware Reset Status Message \n\r");
+		}
 }
 
 

@@ -152,6 +152,8 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 				printf("wait4start : %i\r\n", ThisEvent.EventParam);
 				// check if byte received is 0x7E 
 				if ( ThisEvent.EventParam == START_DELIMITER ) {
+					printf("------------RECEIVING-------------------\n\r");
+					printf("Start: %i\n\r", ThisEvent.EventParam);
 					// start timer 
 					ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
 					
@@ -220,6 +222,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 				printf("receivingdata : %i\r\n", ThisEvent.EventParam);
 				// if BytesLeft = 0, then we just received the checksum 
 				if (BytesLeft == 0) {
+					printf("CheckSum: %i\n\r", ThisEvent.EventParam);
 					if (ThisEvent.EventParam == (0xFF - CheckSum)) {
 						// if good checksum, post PacketReceived event to Comm_Service
 						ES_Event ThisEvent;         

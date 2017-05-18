@@ -261,9 +261,13 @@ typedef enum {  ES_NO_EVENT = 0,
 								// Receive_SM events
 								ES_BYTE_RECEIVED, ES_DATAPACKET_RECEIVED,
 								// Comm_Service
-								ES_SENDPACKET
+								ES_SENDPACKET,
+								//received messages
+								ES_DOG_REPORT_RECEIVED, ES_DOG_ACK_RECEIVED, ES_DOG_RESET_ENCR_RECEIVED,
+								//Farmer_SM
+								ES_UNPAIR
 
-} ES_EventTyp_t ;
+				} ES_EventTyp_t ;
 
 /****************************************************************************/
 // These are the definitions for the Distribution lists. Each definition
