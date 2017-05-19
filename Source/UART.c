@@ -56,10 +56,10 @@ static uint8_t DataByte;
 void InitUART(void) {
 
 	// 1. Enable clock to UART module using RCGCUART register
-	HWREG(SYSCTL_RCGCUART) |= SYSCTL_RCGCUART_R7;
+	HWREG(SYSCTL_RCGCUART) |= SYSCTL_RCGCUART_R5;
 	
 	// 2. Wait for the UART to be ready (PRUART)
-	while ((HWREG(SYSCTL_PRUART) & SYSCTL_PRUART_R7 ) != SYSCTL_PRUART_R7 )
+	while ((HWREG(SYSCTL_PRUART) & SYSCTL_PRUART_R5 ) != SYSCTL_PRUART_R5 )
 		;
 	
 	// 3. Enable the clock to GPIO Port E (RCGCGPIO)
@@ -69,7 +69,7 @@ void InitUART(void) {
 	while ((HWREG(SYSCTL_PRGPIO) & SYSCTL_PRGPIO_R4 ) != SYSCTL_PRGPIO_R4 )
 		;
 	
-	// 5. Configure GPIO pins: PE0 = digital input, PE1 = digital output
+	// 5. Configure GPIO pins: PE4 = digital input, PE5 = digital output
 	HWREG(GPIO_PORTE_BASE + GPIO_O_DEN) |= (RX_PIN | TX_PIN);
 	HWREG(GPIO_PORTE_BASE + GPIO_O_DIR) |= TX_PIN;
 	HWREG(GPIO_PORTE_BASE + GPIO_O_DIR) &= ~RX_PIN;
@@ -81,33 +81,33 @@ void InitUART(void) {
 	//HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) =
 	//	(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xffffff00) + (1<<0*4) + (1<<1*4);
 	HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) = 
-		(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xfffffff0) + (1<<0*4); //Rx pin 
+		(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xfffffff0) + (1<<4*4); //Rx pin 
 	HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) =
-		(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xffffff0f) + (1<<1*4); //Tx pin
+		(HWREG(GPIO_PORTE_BASE+GPIO_O_PCTL) & 0xffffff0f) + (1<<5*4); //Tx pin
 	
 	// 8. Disable UART (clear UARTEN bit in UARTCTL)
-	HWREG(UART7_BASE + UART_O_CTL) &= ~UART_CTL_UARTEN;
+	HWREG(UART5_BASE + UART_O_CTL) &= ~UART_CTL_UARTEN;
 	
 	// 9. Write integer portion of BRD to UARTIBRD (Baud rate 9600, Integer = 260, Fraction = 27)
-	HWREG(UART7_BASE + UART_O_IBRD) = 260; //0x0104;
+	HWREG(UART5_BASE + UART_O_IBRD) = 260; //0x0104;
 
 	// 10. Write fractional portion of BRD to UARTFBRD
-	HWREG(UART7_BASE + UART_O_FBRD) = 27; //0x1B;
+	HWREG(UART5_BASE + UART_O_FBRD) = 27; //0x1B;
 	
 	// 11. Write desired serial parameters to UARTLCRH
-	HWREG(UART7_BASE + UART_O_LCRH) |= (BIT5HI | BIT6HI); // 8-bit word length, all other bits zero
+	HWREG(UART5_BASE + UART_O_LCRH) |= (BIT5HI | BIT6HI); // 8-bit word length, all other bits zero
 	
 	// 12. Configure UART operation using UARTCTL register 
-	HWREG(UART7_BASE + UART_O_CTL) |= (UART_CTL_RXE | UART_CTL_TXE);// | UART_CTL_EOT); // Enable Receive and Transmit
+	HWREG(UART5_BASE + UART_O_CTL) |= (UART_CTL_RXE | UART_CTL_TXE);// | UART_CTL_EOT); // Enable Receive and Transmit
 	
 	// 13. Enable UART by setting UARTEN bit in UARTCTL 
-	HWREG(UART7_BASE + UART_O_CTL) |= UART_CTL_UARTEN;
+	HWREG(UART5_BASE + UART_O_CTL) |= UART_CTL_UARTEN;
 
 	// locally enable RX interrupts
-	HWREG(UART7_BASE + UART_O_IM) |= UART_IM_RXIM; 
+	HWREG(UART5_BASE + UART_O_IM) |= UART_IM_RXIM; 
 	
-	// set NVIC enable for UART7
-	HWREG(NVIC_EN1) |= BIT31HI;
+	// set NVIC enable for UART5
+	HWREG(NVIC_EN1) |= BIT29HI;
 	
 	// globally enable interrupts 
 	__enable_irq();
@@ -128,13 +128,13 @@ void InitUART(void) {
  void UART_ISR(void) {
 
   // if RXMIS set:
- 	if ((HWREG(UART7_BASE+UART_O_MIS) & UART_MIS_RXMIS) == UART_MIS_RXMIS) {
+ 	if ((HWREG(UART5_BASE+UART_O_MIS) & UART_MIS_RXMIS) == UART_MIS_RXMIS) {
 		//printf("r\r\n");
 		// save new data byte
-		DataByte = HWREG(UART7_BASE + UART_O_DR); 
+		DataByte = HWREG(UART5_BASE + UART_O_DR); 
 
 		// clear interrupt flag (set RXIC in UARTICR)
-		HWREG(UART7_BASE + UART_O_ICR) |= UART_ICR_RXIC;
+		HWREG(UART5_BASE + UART_O_ICR) |= UART_ICR_RXIC;
 
 		// post ByteReceived event to Receive_SM (event param is byte in UARTDR) 
 		ES_Event ThisEvent;
@@ -144,11 +144,11 @@ void InitUART(void) {
  	}
 
 	// else if TXMIS set (FIFO open): // where do we enable TXIM interrupts??? 
-	else if ((HWREG(UART7_BASE+UART_O_MIS) & UART_MIS_TXMIS) == UART_MIS_TXMIS) {
+	else if ((HWREG(UART5_BASE+UART_O_MIS) & UART_MIS_TXMIS) == UART_MIS_TXMIS) {
 	// should get this interrupt for all bytes AFTER the start byte (0x7E) 
 		
 		// clear interrupt flag 
-		HWREG(UART7_BASE + UART_O_ICR) |= UART_ICR_TXIC;
+		HWREG(UART5_BASE + UART_O_ICR) |= UART_ICR_TXIC;
 
 		// post ByteSent event 
 		ES_Event ThisEvent;
@@ -158,7 +158,7 @@ void InitUART(void) {
 		// if this was last byte in message block
 		if (IsLastByte()) { // IsLastByte from Transmit_SM
 			// disable TXIM 
-			HWREG(UART7_BASE + UART_O_IM) &= ~UART_IM_TXIM;
+			HWREG(UART5_BASE + UART_O_IM) &= ~UART_IM_TXIM;
 		}
 		
 	}

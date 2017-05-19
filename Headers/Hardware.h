@@ -58,8 +58,8 @@
 
 //Port E
 
-#define RX_PIN	BIT0HI 	// UART7 Rx: PE0
-#define TX_PIN	BIT1HI	// UART7 Tx: PE1
+#define RX_PIN	BIT4HI 	// UART5 Rx: PE4
+#define TX_PIN	BIT5HI	// UART5 Tx: PE5
 //Port F
 
 
