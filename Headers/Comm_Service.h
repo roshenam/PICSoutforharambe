@@ -5,6 +5,7 @@
 #include "ES_Types.h"
 #include "ES_Events.h"
 
+void ResetEncryptionIndex(void);
 
 bool InitComm_Service ( uint8_t Priority );
 bool PostComm_Service( ES_Event ThisEvent );

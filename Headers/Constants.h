@@ -36,6 +36,14 @@
 #define FARMER_DOG_CTRL           0x04
 #define DOG_FARMER_RESET_ENCR     0x05
 
+//Data Packet Lengths (API ID + Frame ID + Dest bytes + Options + RF data)
+#define REQ_2_PAIR_LENGTH					7
+#define PAIR_ACK_LENGTH						6
+#define	ENCR_KEY_LENGTH						38
+#define CTRL_LENGTH								9
+#define	ENCR_RESET_LENGTH					6
+#define STATUS_LENGTH							18
+
 //Data Packet Array
 #define FRAME_ID                  0x01
 #define API_IDENTIFIER_Tx         0x01
@@ -59,6 +67,7 @@
 #define DEST_ADDRESS_LSB_INDEX    6
 #define OPTIONS_BYTE_INDEX_TX     7
 #define PACKET_TYPE_BYTE_INDEX_TX 8 
+#define DATA_BYTE_INDEX_TX				9	
 
 //Rx Packet
 #define API_IDENT_BYTE_INDEX_RX   0
@@ -81,7 +90,7 @@
 
 //Timers
 #define ONE_SEC										976
-#define GAME_TIME									218*ONE_SEC
+//#define GAME_TIME									218*ONE_SEC
 #define INTER_MESSAGE_TIME				300	// FARMER transmits a packet every 300 ms 
 #define LOST_COMM_TIME						ONE_SEC // DOG+FARMER unpair if no message received after 1 second
 

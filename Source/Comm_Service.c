@@ -30,13 +30,14 @@
 /*---------------------------- Module Functions ---------------------------*/
 static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType);
 static void InterpretPacket(uint8_t SizeOfData); 
+void ResetEncryptionIndex(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 static uint8_t MyPriority;
 
 static uint8_t* DataPacket_Rx;
-static uint8_t DataPacket_Tx[40];
-
+static uint8_t DataPacket_Tx[42];
+static uint8_t EncryptionIndex;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -142,53 +143,115 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType) {
 		printf("--------------CONSTRUCTING-----------\n\r");
 					ES_Event NewEvent;
+					
+					// initialize RunningSum variable
+					uint8_t RunningSum = 0;
+					uint8_t CheckSum;
+	
+					// initialize pointer to data
+					uint8_t* DataToSend;
+					
 					//Header Construction
-					printf("Constructing Datapacket (Comm_Service) \n\r");
-					DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER;
-					DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00; 
+					DataPacket_Tx[START_BYTE_INDEX] = START_DELIMITER; // don't add to RunningSum
+					DataPacket_Tx[LENGTH_MSB_BYTE_INDEX] = 0x00; // don't add to RunningSum
+		
 					DataPacket_Tx[API_IDENT_BYTE_INDEX_TX] = API_IDENTIFIER_Tx;
+					RunningSum += API_IDENTIFIER_Tx;
 					DataPacket_Tx[FRAME_ID_BYTE_INDEX] = FRAME_ID;
+					RunningSum += FRAME_ID;
 					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = DestMSB; 
+					RunningSum += DestMSB;
 					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = DestLSB; 
+					RunningSum += DestLSB;
 					DataPacket_Tx[OPTIONS_BYTE_INDEX_TX] = OPTIONS;
+					RunningSum += OPTIONS;
+	
 					switch (PacketType) {
 						case FARMER_DOG_REQ_2_PAIR:
 							printf("Req 2 Pair Construction (Comm Service) \n\r");
-						  /*************REDO ALL VALUES HERE************/
 							//add the unique frame length
-							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = 7;
+							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = REQ_2_PAIR_LENGTH; // don't add to RunningSum
+						
 							//add the packet type
 							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_REQ_2_PAIR;
-							//ADD DATA
-							// add check sum
-							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x4F;
+							RunningSum += FARMER_DOG_REQ_2_PAIR;
+						
+							//get data
+							uint8_t DogTag = GetDogTag();
+						
+							//add data 
+							DataPacket_Tx[DATA_BYTE_INDEX_TX] = DogTag;
+							RunningSum += DogTag;
+						
+							// calculate and add check sum
+							CheckSum = 0xFF - RunningSum;
+							DataPacket_Tx[DATA_BYTE_INDEX_TX+1] = CheckSum;
+						
 						  //set the frame length as event param
-							NewEvent.EventParam = 7;						
+							NewEvent.EventParam = REQ_2_PAIR_LENGTH;						
 							break;
+							
 						case FARMER_DOG_ENCR_KEY:
-							/*************REDO ALL VALUES HERE************/
 							printf("Encryption Key Construction (Comm Service) \n\r");
 							//add the unique frame length
-							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = 7;
+							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = ENCR_KEY_LENGTH; // don't add to RunningSum
+						
 							//add the packet type
 							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_ENCR_KEY;
+							RunningSum += FARMER_DOG_ENCR_KEY;
+							
+							// get data (encryption key)
+							DataToSend = GetEncryptionKey();
+						
+							// add data
+							for (int i = 0; i < 32; i++) {
+								DataPacket_Tx[DATA_BYTE_INDEX_TX+i] = *(DataToSend + i);
+								RunningSum += *(DataToSend + i);
+							}
+						
 							// add check sum
-							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+1] = 0x4F;
+							CheckSum = 0xFF - RunningSum;
+							DataPacket_Tx[DATA_BYTE_INDEX_TX + 32] = CheckSum;
+						
 						  //set the frame length as event param
-							NewEvent.EventParam = 7;	
+							NewEvent.EventParam = ENCR_KEY_LENGTH;	
 							break;
+							
 						case FARMER_DOG_CTRL:
-							/*************REDO ALL VALUES HERE************/
 							printf("Farmer Control Construction \n\r");
-								//add the unique frame length
-							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = 7;
-							//add the packet type
-							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_CTRL;
-							//add in data from IMU SERVICE
+							//add the unique frame length
+							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = CTRL_LENGTH; // don't add to RunningSum
+							
+							// get encryption key
+							uint8_t* EncryptionData = GetEncryptionKey();
+							//uint8_t EncryptionKey = *(EncryptionData + EncryptionIndex);
+						
+							//encrypt + add the packet type
+							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_CTRL^(*(EncryptionData + EncryptionIndex));
+							RunningSum += FARMER_DOG_CTRL^(*(EncryptionData + EncryptionIndex));
+							// increment encryption index
+							EncryptionIndex++;
+							if (EncryptionIndex > 31) EncryptionIndex = 0;
+						
+							// get data (from sensors)
+							DataToSend = GetSensorData(); 
+						
+							// encrypt data THEN add data
+							for (int i = 0; i < 3; i++) {
+								uint8_t CurrentDataByte = *(DataToSend + i);
+								DataPacket_Tx[DATA_BYTE_INDEX_TX+i] = CurrentDataByte^(*(EncryptionData + EncryptionIndex));
+								RunningSum += CurrentDataByte^(*(EncryptionData + EncryptionIndex));
+								// increment encryption index
+								EncryptionIndex++;
+								if (EncryptionIndex > 31) EncryptionIndex = 0;
+							}
+						
 							// add check sum
-							//DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX+13] = ???; NEED TO CALCULATE THE CHECKSUM CORRECTLY!!!
+							CheckSum = 0xFF - RunningSum;
+							DataPacket_Tx[DATA_BYTE_INDEX_TX + 3] = CheckSum; 
+						
 						  //set the frame length as event param
-							NewEvent.EventParam = 7;	
+							NewEvent.EventParam = CTRL_LENGTH;	
 							break;
 					}
 		
@@ -250,4 +313,6 @@ uint8_t* GetDataPacket_Tx (void) {
   return &DataPacket_Tx[0];
 }
 
-
+void ResetEncryptionIndex(void) {
+	EncryptionIndex = 0;
+}

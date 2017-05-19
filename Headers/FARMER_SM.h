@@ -7,6 +7,10 @@
 
 typedef enum {InitFARMER, Wait2Pair, Wait4PairResponse, Paired} FARMERState_t ;
 
+uint8_t* GetEncryptionKey(void);
+uint8_t GetDogTag(void);
+uint8_t* GetSensorData(void); // placeholder
+
 bool InitFARMER_SM ( uint8_t Priority );
 bool PostFARMER_SM( ES_Event ThisEvent );
 ES_Event RunFARMER_SM( ES_Event ThisEvent );

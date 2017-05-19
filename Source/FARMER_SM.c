@@ -20,16 +20,24 @@
 #include "FARMER_SM.h"
 
 /*----------------------------- Module Defines ----------------------------*/
-
+#define NUM_ENCRYPTION_BYTES 32
 
 
 /*---------------------------- Module Functions ---------------------------*/
-
+static void CreateEncryptionKey(void);
+uint8_t* GetEncryptionKey(void);
+uint8_t* GetSensorData(void); // placeholder
 
 /*---------------------------- Module Variables ---------------------------*/
 static FARMERState_t CurrentState;
 
 static uint8_t MyPriority;
+
+static uint8_t EncryptionKey[NUM_ENCRYPTION_BYTES]; // array of 32 encryption keys 
+
+static uint8_t DogTag = 0x01;
+
+static uint16_t GameTimerLength;
 
 
 /*------------------------------ Module Code ------------------------------*/
@@ -153,22 +161,32 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 
 		case Wait4PairResponse:      
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
+				printf("Lost communication\r\n");
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
 			}
 			
 			if (ThisEvent.EventType == ES_DOG_ACK_RECEIVED ) {
+				// generate ecryption key 
+				CreateEncryptionKey();
+				
 				// send an ENCR_KEY packet 
 				ES_Event NewEvent;
 				NewEvent.EventType = ES_SENDPACKET;
 				NewEvent.EventParam = FARMER_DOG_ENCR_KEY;
 				PostComm_Service(NewEvent);
 				
+				// set encryption index to zero
+				ResetEncryptionIndex();
+				
 				// start LOST_COMM timer
 				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
 				
 				// start INTER_MESSAGE timer
 				ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
+				
+				// start GameTimer
+				ES_Timer_InitTimer(GAME_TIMER, GameTimerLength);
 				
 				// go to Paired state
 				CurrentState = Paired;
@@ -177,7 +195,14 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
     break;
 
 		case Paired:      
+			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == GAME_TIMER ) {
+				printf("GAME OVER\r\n");
+				// go back to Wait2Pair state
+				CurrentState = Wait2Pair;
+			}
+		
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
+				printf("Lost communication\r\n");
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
 			}
@@ -199,7 +224,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			}
 			
 			if ( ThisEvent.EventType == ES_DOG_RESET_ENCR_RECEIVED ) {
-				// reset encryption index to zero 
+				ResetEncryptionIndex();
 				
 				// start LOST_COMM timer
 				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
@@ -211,4 +236,71 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
       ;
   }                                   // end switch on Current State
   return ReturnEvent;
+}
+
+/****************************************************************************
+ Function
+     CreateEncryptionKey
+
+ Parameters
+     none
+
+ Returns
+     none
+
+ Description
+     Populates EncryptionKey array with 32 randomly-generated encryption bytes
+
+ Author
+     Sarah Cabreros
+****************************************************************************/
+static void CreateEncryptionKey(void) {
+	for (int i = 0; i < NUM_ENCRYPTION_BYTES; i++) {
+		EncryptionKey[i] = rand() % 255; // generate a random integer between 0 and 255
+	}
+}
+
+/****************************************************************************
+ Function
+     GetEncryptionKey
+
+ Parameters
+     none
+
+ Returns
+     Pointer to first element in EncryptionKey array
+
+ Description
+     Getter function to access EncryptionKey array
+
+ Author
+     Sarah Cabreros
+****************************************************************************/
+uint8_t* GetEncryptionKey(void) {
+	return &EncryptionKey[0];
+}
+
+/****************************************************************************
+ Function
+     GetDogTag
+
+ Parameters
+     none
+
+ Returns
+     DogTag of paired DOG
+
+ Description
+     Getter function for paired DogTag
+
+ Author
+     Sarah Cabreros
+****************************************************************************/
+uint8_t GetDogTag(void) {
+	return DogTag;
+}
+
+uint8_t* GetSensorData(void) {
+	static uint8_t Placeholder_Data[3] = {0xFF, 0x00, 0xFF};
+	return &Placeholder_Data[0];
 }

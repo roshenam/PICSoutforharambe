@@ -314,7 +314,7 @@ typedef enum {  ES_NO_EVENT = 0,
 // priority in servicing them
 #define TIMER_UNUSED ((pPostFunc)0)
 #define TIMER0_RESP_FUNC PostReceive_SM
-#define TIMER1_RESP_FUNC TIMER_UNUSED
+#define TIMER1_RESP_FUNC PostFARMER_SM
 #define TIMER2_RESP_FUNC PostTransmit_SM
 #define TIMER3_RESP_FUNC PostFARMER_SM
 #define TIMER4_RESP_FUNC PostFARMER_SM
@@ -338,7 +338,7 @@ typedef enum {  ES_NO_EVENT = 0,
 // These symbolic names should be changed to be relevant to your application 
 
 #define RECEIVE_TIMER 0
-//#define GameTimer 1
+#define GAME_TIMER 1
 #define TRANSMIT_TIMER 2
 #define INTER_MESSAGE_TIMER 3
 #define LOST_COMM_TIMER	4
