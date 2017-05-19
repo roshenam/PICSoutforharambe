@@ -146,6 +146,7 @@ void InitUART(void) {
 	// else if TXMIS set (FIFO open): // where do we enable TXIM interrupts??? 
 	else if ((HWREG(UART5_BASE+UART_O_MIS) & UART_MIS_TXMIS) == UART_MIS_TXMIS) {
 	// should get this interrupt for all bytes AFTER the start byte (0x7E) 
+		//printf("t\r\n");
 		
 		// clear interrupt flag 
 		HWREG(UART5_BASE + UART_O_ICR) |= UART_ICR_TXIC;

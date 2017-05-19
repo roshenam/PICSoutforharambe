@@ -256,6 +256,8 @@ typedef enum {  ES_NO_EVENT = 0,
                 ES_SHORT_TIMEOUT, /* signals that a short timer has expired */
                 /* User-defined events start here */
                 ES_NEW_KEY, /* signals a new key received from terminal */
+								//FARMER_SM pairing/unpairing requests
+								ES_UNPAIR, ES_PAIR,
 								// Transmit_SM events
 								ES_START_XMIT, ES_BYTE_SENT,
 								// Receive_SM events
@@ -263,9 +265,8 @@ typedef enum {  ES_NO_EVENT = 0,
 								// Comm_Service
 								ES_SENDPACKET,
 								// FARMER_SM received messages
-								ES_DOG_REPORT_RECEIVED, ES_DOG_ACK_RECEIVED, ES_DOG_RESET_ENCR_RECEIVED,
-								//FARMER_SM pairing/unpairing requests
-								ES_UNPAIR, ES_PAIR
+								ES_DOG_REPORT_RECEIVED, ES_DOG_ACK_RECEIVED, ES_DOG_RESET_ENCR_RECEIVED
+								
 				} ES_EventTyp_t ;
 
 /****************************************************************************/

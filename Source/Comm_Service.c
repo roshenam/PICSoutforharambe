@@ -31,6 +31,7 @@
 static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType);
 static void InterpretPacket(uint8_t SizeOfData); 
 void ResetEncryptionIndex(void);
+uint8_t* GetIMUData(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 static uint8_t MyPriority;
@@ -38,6 +39,7 @@ static uint8_t MyPriority;
 static uint8_t* DataPacket_Rx;
 static uint8_t DataPacket_Tx[42];
 static uint8_t EncryptionIndex;
+static uint8_t IMU_Data[12];
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -283,6 +285,10 @@ static void InterpretPacket(uint8_t SizeOfData) {
 			switch (PacketType) {
 				case DOG_FARMER_REPORT :
 					NewEvent.EventType = ES_DOG_REPORT_RECEIVED;
+					// get IMU data
+					for (int i = 0; i < 12; i++ ) {
+						IMU_Data[i] = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX + i);
+					}
 					break;
 				case DOG_ACK :
 					NewEvent.EventType = ES_DOG_ACK_RECEIVED;
@@ -311,6 +317,10 @@ static void InterpretPacket(uint8_t SizeOfData) {
 /******GETTER FUNCTIONS************/
 uint8_t* GetDataPacket_Tx (void) {
   return &DataPacket_Tx[0];
+}
+
+uint8_t* GetIMUData (void) {
+	return &IMU_Data[0];
 }
 
 void ResetEncryptionIndex(void) {

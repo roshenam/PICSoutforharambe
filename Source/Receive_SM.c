@@ -149,7 +149,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
     case Wait4Start:      
 			// waiting to receive 0x7E 
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				printf("wait4start : %i\r\n", ThisEvent.EventParam);
+				//printf("wait4start : %i\r\n", ThisEvent.EventParam);
 				// check if byte received is 0x7E 
 				if ( ThisEvent.EventParam == START_DELIMITER ) {
 					printf("------------RECEIVING-------------------\n\r");

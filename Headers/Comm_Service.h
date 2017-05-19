@@ -13,5 +13,6 @@ ES_Event RunComm_Service( ES_Event ThisEvent );
 
 /***getter***/
 uint8_t* GetDataPacket_Tx (void);
+uint8_t* GetIMUData(void);
 
 #endif 

@@ -61,22 +61,13 @@ static uint16_t GameTimerLength;
 ****************************************************************************/
 bool InitFARMER_SM ( uint8_t Priority )
 {
-  ES_Event ThisEvent;
-
   MyPriority = Priority;
-  // put us into the Initial PseudoState
-  CurrentState = InitFARMER;
-	
-  // post the initial transition event
-  ThisEvent.EventType = ES_INIT;
+  
+	CurrentState = Wait2Pair;
+
 	printf("Initialized in FARMER_SM\r\n");
-  if (ES_PostToService( MyPriority, ThisEvent) == true)
-  {
-      return true;
-  }else
-  {
-      return false;
-  }
+  
+	return true;
 }
 
 /****************************************************************************
@@ -122,26 +113,20 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 {
   ES_Event ReturnEvent;
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
-	
-	if (ThisEvent.EventType == ES_UNPAIR) {
-		printf("UNPAIRED\r\n");
-		//if there is ever a place where we want to unpair, send this event to farmer_sm
-		//most likeley for debugging - add in a key-press event that sends this event
-		CurrentState = Wait2Pair;
-	}
 
   switch ( CurrentState )
   {
-    case InitFARMER :       
-        if ( ThisEvent.EventType == ES_INIT )// only respond to ES_Init
-        {
-            // set current state to Wait2Pair
-            CurrentState = Wait2Pair;
-         }
-    break;
 
-    case Wait2Pair:      
+    case Wait2Pair: 
+			printf("wait2pair \r\n");
  
+			if (ThisEvent.EventType == ES_UNPAIR) {
+				printf("UNPAIRED\r\n");
+				//if there is ever a place where we want to unpair, send this event to farmer_sm
+				//most likeley for debugging - add in a key-press event that sends this event
+				CurrentState = Wait2Pair;
+			}
+		
 			if ( ThisEvent.EventType == ES_PAIR) {
 				printf("PAIRED\r\n");
 				
@@ -155,13 +140,24 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				
 				// start LOST_COMM timer
 				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
+				
+				// go to Wait4PairResponse
+				CurrentState = Wait4PairResponse;
 			}
       
     break;
 
 		case Wait4PairResponse:      
+
+			if (ThisEvent.EventType == ES_UNPAIR) {
+				printf("UNPAIRED\r\n");
+				//if there is ever a place where we want to unpair, send this event to farmer_sm
+				//most likeley for debugging - add in a key-press event that sends this event
+				CurrentState = Wait2Pair;
+			}
+			
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
-				printf("Lost communication\r\n");
+				printf("Lost communication, No ACK\r\n");
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
 			}
@@ -195,6 +191,14 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
     break;
 
 		case Paired:      
+			
+			if (ThisEvent.EventType == ES_UNPAIR) {
+				printf("UNPAIRED\r\n");
+				//if there is ever a place where we want to unpair, send this event to farmer_sm
+				//most likeley for debugging - add in a key-press event that sends this event
+				CurrentState = Wait2Pair;
+			}
+			
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == GAME_TIMER ) {
 				printf("GAME OVER\r\n");
 				// go back to Wait2Pair state

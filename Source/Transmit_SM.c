@@ -230,7 +230,7 @@ static void SendByte(uint8_t DataByte) {
 	if((HWREG(UART5_BASE + UART_O_FR)&UART_FR_TXFE) != 0){
 		// write data to DR 
 		HWREG(UART5_BASE + UART_O_DR) = DataByte; 
-		printf("Sending byte: %i\r\n", DataByte);
+		//printf("Sending byte: %i\r\n", DataByte);
 	}else{
 		printf("Fifo not empty\r\n");
 	}	

@@ -70,12 +70,14 @@ bool Check4Keystroke(void)
     //PostFARMER_SM( ThisEvent );
 		
 		if (GetNewKey() == 'd' || GetNewKey() == 'D') {
+			printf("d\r\n");
 			ES_Event ThisEvent;
 			ThisEvent.EventType = ES_PAIR;
 			PostFARMER_SM(ThisEvent);
 		}
 		
-		if (GetNewKey() == 'u' || GetNewKey() == 'U') {
+		else if (GetNewKey() == 'u' || GetNewKey() == 'U') {
+			printf("u\r\n");
 			ES_Event ThisEvent;
 			ThisEvent.EventType = ES_UNPAIR;
 			PostFARMER_SM(ThisEvent);

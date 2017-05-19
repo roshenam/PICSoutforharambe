@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Outputs\BaseTarget.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Outputs\BaseTarget.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Fri May 19 15:48:41 2017
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Fri May 19 16:49:25 2017
 <BR><P>
 <H3>Maximum Stack Usage =        184 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -245,7 +245,7 @@ Global Symbols
 
 <P><STRONG><a name="[98]"></a>CPUbasepriGet</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, cpu.o(.emb_text), UNUSED)
 
-<P><STRONG><a name="[5e]"></a>rand</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, rand.o(.emb_text))
+<P><STRONG><a name="[5f]"></a>rand</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, rand.o(.emb_text))
 <BR><BR>[Called By]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunFARMER_SM
 </UL>
 
@@ -273,6 +273,7 @@ Global Symbols
 <LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunComm_Service
 <LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InterpretPacket
 <LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ConstructPacket
+<LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Check4Keystroke
 <LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -415,12 +416,14 @@ Global Symbols
 <LI><a href="#[48]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_DeQueue
 </UL>
 
-<P><STRONG><a name="[c]"></a>Check4Keystroke</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, eventcheckers.o(i.Check4Keystroke))
-<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = Check4Keystroke &rArr; PostFARMER_SM &rArr; ES_PostToService &rArr; ES_EnQueueFIFO
+<P><STRONG><a name="[c]"></a>Check4Keystroke</STRONG> (Thumb, 84 bytes, Stack size 8 bytes, eventcheckers.o(i.Check4Keystroke))
+<BR><BR>[Stack]<UL><LI>Max Depth = 136 + Unknown Stack Size
+<LI>Call Chain = Check4Keystroke &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;kbhit
 <LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostFARMER_SM
 <LI><a href="#[37]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;getc
+<LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_checkevents.o(.constdata)
 </UL>
@@ -473,8 +476,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_EnQueueFIFO
 </UL>
-<BR>[Called By]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitFARMER_SM
-<LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitTransmit_SM
+<BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitTransmit_SM
 <LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostReceive_SM
 <LI><a href="#[f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitReceive_SM
 <LI><a href="#[17]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostTransmit_SM
@@ -503,7 +505,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Initialize
 </UL>
 
-<P><STRONG><a name="[60]"></a>ES_Timer_InitTimer</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, es_timers.o(i.ES_Timer_InitTimer))
+<P><STRONG><a name="[5e]"></a>ES_Timer_InitTimer</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, es_timers.o(i.ES_Timer_InitTimer))
 <BR><BR>[Called By]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunFARMER_SM
 <LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunTransmit_SM
 <LI><a href="#[10]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunReceive_SM
@@ -563,12 +565,11 @@ Global Symbols
 <P><STRONG><a name="[d]"></a>InitComm_Service</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, comm_service.o(i.InitComm_Service))
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[13]"></a>InitFARMER_SM</STRONG> (Thumb, 38 bytes, Stack size 16 bytes, farmer_sm.o(i.InitFARMER_SM))
-<BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
+<P><STRONG><a name="[13]"></a>InitFARMER_SM</STRONG> (Thumb, 20 bytes, Stack size 8 bytes, farmer_sm.o(i.InitFARMER_SM))
+<BR><BR>[Stack]<UL><LI>Max Depth = 136 + Unknown Stack Size
 <LI>Call Chain = InitFARMER_SM &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
-<BR>[Calls]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_PostToService
-<LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
+<BR>[Calls]<UL><LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
@@ -644,7 +645,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_timers.o(.constdata)
 </UL>
-<P><STRONG><a name="[5f]"></a>ResetEncryptionIndex</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, comm_service.o(i.ResetEncryptionIndex))
+<P><STRONG><a name="[60]"></a>ResetEncryptionIndex</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, comm_service.o(i.ResetEncryptionIndex))
 <BR><BR>[Called By]<UL><LI><a href="#[14]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunFARMER_SM
 </UL>
 
@@ -658,24 +659,24 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[14]"></a>RunFARMER_SM</STRONG> (Thumb, 270 bytes, Stack size 40 bytes, farmer_sm.o(i.RunFARMER_SM))
+<P><STRONG><a name="[14]"></a>RunFARMER_SM</STRONG> (Thumb, 284 bytes, Stack size 40 bytes, farmer_sm.o(i.RunFARMER_SM))
 <BR><BR>[Stack]<UL><LI>Max Depth = 168 + Unknown Stack Size
 <LI>Call Chain = RunFARMER_SM &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
-<BR>[Calls]<UL><LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Timer_InitTimer
-<LI><a href="#[5f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ResetEncryptionIndex
+<BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Timer_InitTimer
+<LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ResetEncryptionIndex
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostComm_Service
-<LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rand
+<LI><a href="#[5f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;rand
 <LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> es_framework.o(.constdata)
 </UL>
-<P><STRONG><a name="[10]"></a>RunReceive_SM</STRONG> (Thumb, 280 bytes, Stack size 32 bytes, receive_sm.o(i.RunReceive_SM))
+<P><STRONG><a name="[10]"></a>RunReceive_SM</STRONG> (Thumb, 272 bytes, Stack size 32 bytes, receive_sm.o(i.RunReceive_SM))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160 + Unknown Stack Size
 <LI>Call Chain = RunReceive_SM &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitUART
-<LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Timer_InitTimer
+<LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Timer_InitTimer
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PostComm_Service
 <LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
@@ -686,7 +687,7 @@ Global Symbols
 <LI>Call Chain = RunTransmit_SM &rArr; SendByte &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
 <BR>[Calls]<UL><LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendByte
-<LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Timer_InitTimer
+<LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Timer_InitTimer
 <LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GetDataPacket_Tx
 <LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2printf
 </UL>
@@ -887,7 +888,7 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunComm_Service
 </UL>
 
-<P><STRONG><a name="[5b]"></a>InterpretPacket</STRONG> (Thumb, 108 bytes, Stack size 16 bytes, comm_service.o(i.InterpretPacket))
+<P><STRONG><a name="[5b]"></a>InterpretPacket</STRONG> (Thumb, 128 bytes, Stack size 16 bytes, comm_service.o(i.InterpretPacket))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
 <LI>Call Chain = InterpretPacket &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -898,7 +899,7 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RunComm_Service
 </UL>
 
-<P><STRONG><a name="[63]"></a>SendByte</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, transmit_sm.o(i.SendByte))
+<P><STRONG><a name="[63]"></a>SendByte</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, transmit_sm.o(i.SendByte))
 <BR><BR>[Stack]<UL><LI>Max Depth = 128 + Unknown Stack Size
 <LI>Call Chain = SendByte &rArr; __2printf &rArr; _printf_char_file &rArr; _printf_char_common &rArr; __printf
 </UL>
