@@ -4,7 +4,7 @@
 #include "ES_Configure.h"
 #include "ES_Types.h"
 
-typedef enum { InitTransmit, Idle, SendingData } TransmitState_t ;
+typedef enum { Idle, SendingData } TransmitState_t ;
 
 bool IsLastByte(void);
 

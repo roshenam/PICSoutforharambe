@@ -251,7 +251,7 @@
 // Universal events occupy the lowest entries, followed by user-defined events
 typedef enum {  ES_NO_EVENT = 0,
                 ES_ERROR,  /* used to indicate an error from the service */
-                ES_INIT,   /* used to transition from initial pseudo-state */
+                //ES_INIT,   /* used to transition from initial pseudo-state */
                 ES_TIMEOUT, /* signals that the timer has expired */
                 ES_SHORT_TIMEOUT, /* signals that a short timer has expired */
                 /* User-defined events start here */

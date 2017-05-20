@@ -74,22 +74,17 @@ static bool LastByteFlag = 0;
 ****************************************************************************/
 bool InitTransmit_SM ( uint8_t Priority )
 {
-  ES_Event ThisEvent;
-
   MyPriority = Priority;
-  // put us into the Initial PseudoState
-  CurrentState = InitTransmit;
 	
-  // post the initial transition event
-  ThisEvent.EventType = ES_INIT;
-	printf("Initialized in Transmit_SM\r\n");
-  if (ES_PostToService( MyPriority, ThisEvent) == true)
-  {
-      return true;
-  }else
-  {
-      return false;
-  }
+  // set index to zero
+  index = 0; 
+
+  // get pointer to array of message
+  DataToSend = GetDataPacket_Tx(); // function from Comm_Service
+	
+	CurrentState = Idle;
+	
+	return true;
 }
 
 /****************************************************************************
@@ -138,19 +133,6 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 
   switch ( CurrentState )
   {
-    case InitTransmit :       
-        if ( ThisEvent.EventType == ES_INIT )// only respond to ES_Init
-        {
-            // set current state to Idle
-            CurrentState = Idle;
-
-            // set index to zero
-            index = 0; 
-
-            // get pointer to array of message
-            DataToSend = GetDataPacket_Tx(); // function from Comm_Service
-         }
-    break;
 
     case Idle:      
 			// waiting to receive Start_Xmit event from Comm_Service
@@ -165,7 +147,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 				// send first byte of array 
 				uint8_t CurrentByte = *(DataToSend+index);
 				SendByte(CurrentByte);
-				printf("start xmit: %i\n\r ", CurrentByte);
+				//printf("start xmit: %i\n\r ", CurrentByte);
 
 				// increment index 
 				index++;
@@ -193,7 +175,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 				
 				// if index = length of array, we are done sending data
 				if (index == DataPacketLength) {
-					printf("sent all bytes \n\r");
+					//printf("sent all bytes \n\r");
 					// set LastByteFlag
 					LastByteFlag = 1;
 
@@ -206,7 +188,7 @@ ES_Event RunTransmit_SM( ES_Event ThisEvent )
 					// send next byte of array 
 					uint8_t CurrentByte = *(DataToSend+index);
 					SendByte(CurrentByte);
-					printf("xmit data: %i\n\r", CurrentByte);
+					//printf("xmit data: %i\n\r", CurrentByte);
 					
 					// increment index 
 					index++;

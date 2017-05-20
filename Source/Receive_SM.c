@@ -67,24 +67,17 @@ static uint8_t *outgoingDataPacket; //pointer to data packet
 ****************************************************************************/
 bool InitReceive_SM ( uint8_t Priority )
 {
-  ES_Event ThisEvent;
 
   MyPriority = Priority;
-  // put us into the Initial PseudoState
-  CurrentState = InitReceive;
-	
+  
+	// initialize UART
+	InitUART();
+
 	outgoingDataPacket = &DataPacket[0]; // address of first entry in data packet array
 	
-  // post the initial transition event
-  ThisEvent.EventType = ES_INIT;
-	printf("Initialized in Receive_SM\r\n");
-  if (ES_PostToService( MyPriority, ThisEvent) == true)
-  {
-      return true;
-  }else
-  {
-      return false;
-  }
+	CurrentState = Wait4Start;
+	
+  return true;
 }
 
 /****************************************************************************
@@ -133,18 +126,6 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 
   switch ( CurrentState )
   {
-    case InitReceive :       
-        if ( ThisEvent.EventType == ES_INIT )// only respond to ES_Init
-        {
-            // initialize UART
-						InitUART();
-
-						outgoingDataPacket = &DataPacket[0];
-					
-            // set current state to Wait4Start 
-            CurrentState = Wait4Start;
-         }
-    break;
 
     case Wait4Start:      
 			// waiting to receive 0x7E 
@@ -152,8 +133,8 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 				//printf("wait4start : %i\r\n", ThisEvent.EventParam);
 				// check if byte received is 0x7E 
 				if ( ThisEvent.EventParam == START_DELIMITER ) {
-					printf("------------RECEIVING-------------------\n\r");
-					printf("Start: %i\n\r", ThisEvent.EventParam);
+					//printf("------------RECEIVING-------------------\n\r");
+					//printf("Start: %i\n\r", ThisEvent.EventParam);
 					// start timer 
 					ES_Timer_InitTimer(RECEIVE_TIMER, RECEIVE_TIMER_LENGTH);
 					
@@ -171,7 +152,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}
 			
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				printf("wait4msb : %i\r\n", ThisEvent.EventParam);
+				//printf("wait4msb : %i\r\n", ThisEvent.EventParam);
 				// store MSB in data packet 
 				MSBLength = ThisEvent.EventParam; 
 				// start receive timer
@@ -189,7 +170,7 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}		
 
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				printf("wait4lsb : %i\r\n", ThisEvent.EventParam);
+				//printf("wait4lsb : %i\r\n", ThisEvent.EventParam);
 				// store LSB in data packet 
 				LSBLength = ThisEvent.EventParam; 
 				
@@ -219,16 +200,17 @@ ES_Event RunReceive_SM( ES_Event ThisEvent )
 			}		
 			
 			if ( ThisEvent.EventType == ES_BYTE_RECEIVED ) {
-				printf("receivingdata : %i\r\n", ThisEvent.EventParam);
+				//printf("receivingdata : %i\r\n", ThisEvent.EventParam);
 				// if BytesLeft = 0, then we just received the checksum 
 				if (BytesLeft == 0) {
-					printf("CheckSum: %i\n\r", ThisEvent.EventParam);
+					//printf("CheckSum: %i\n\r", ThisEvent.EventParam);
 					if (ThisEvent.EventParam == (0xFF - CheckSum)) {
 						// if good checksum, post PacketReceived event to Comm_Service
 						ES_Event ThisEvent;         
 						ThisEvent.EventType = ES_DATAPACKET_RECEIVED;
 						ThisEvent.EventParam = FrameLength; 
 						PostComm_Service(ThisEvent);
+						//printf("data packet received (good checksum)\r\n");
 					} else {
 						// if bad checksum, don't do anything? 
 					}

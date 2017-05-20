@@ -5,7 +5,7 @@
 #include "ES_Types.h"
 #include "ES_Events.h"
 
-typedef enum { InitReceive, Wait4Start, Wait4MSBLength, Wait4LSBLength, ReceivingData } ReceiveState_t ;
+typedef enum { Wait4Start, Wait4MSBLength, Wait4LSBLength, ReceivingData } ReceiveState_t ;
 
 bool InitReceive_SM ( uint8_t Priority );
 bool PostReceive_SM( ES_Event ThisEvent );

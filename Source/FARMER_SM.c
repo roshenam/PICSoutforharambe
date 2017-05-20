@@ -35,7 +35,7 @@ static uint8_t MyPriority;
 
 static uint8_t EncryptionKey[NUM_ENCRYPTION_BYTES]; // array of 32 encryption keys 
 
-static uint8_t DogTag = 0x01;
+static uint8_t DogTag = 0x00;
 
 static uint16_t GameTimerLength;
 
@@ -182,7 +182,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
 				
 				// start GameTimer
-				ES_Timer_InitTimer(GAME_TIMER, GameTimerLength);
+				ES_Timer_InitTimer(GAME_TIMER, 10000);
 				
 				// go to Paired state
 				CurrentState = Paired;
@@ -305,6 +305,6 @@ uint8_t GetDogTag(void) {
 }
 
 uint8_t* GetSensorData(void) {
-	static uint8_t Placeholder_Data[3] = {0xFF, 0x00, 0xFF};
+	static uint8_t Placeholder_Data[3] = {0x00, 0x00, 0x42};
 	return &Placeholder_Data[0];
 }

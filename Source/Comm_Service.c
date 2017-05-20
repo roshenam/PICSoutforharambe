@@ -143,7 +143,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
    Sarah Cabreros
 ****************************************************************************/
 static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType) {
-		printf("--------------CONSTRUCTING-----------\n\r");
+		//printf("--------------CONSTRUCTING-----------\n\r");
 					ES_Event NewEvent;
 					
 					// initialize RunningSum variable
@@ -287,7 +287,8 @@ static void InterpretPacket(uint8_t SizeOfData) {
 					NewEvent.EventType = ES_DOG_REPORT_RECEIVED;
 					// get IMU data
 					for (int i = 0; i < 12; i++ ) {
-						IMU_Data[i] = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX + i);
+						IMU_Data[i] = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX + i + 1); // IMU data starts AFTER packet type byte
+						printf("data: %i\r\n", IMU_Data[i]);
 					}
 					break;
 				case DOG_ACK :
@@ -300,12 +301,12 @@ static void InterpretPacket(uint8_t SizeOfData) {
 			NewEvent.EventParam = SizeOfData; //the frame length
 			PostFARMER_SM(NewEvent);
 		} else if (API_Ident == API_IDENTIFIER_Tx_Result) { 
-			printf("RECEIVED A TRANSMISSION RESULT DATAPACKET (Comm_Service): ");
+			//printf("RECEIVED A TRANSMISSION RESULT DATAPACKET (Comm_Service): ");
 			uint8_t TxStatusResult = *(DataPacket_Rx + TX_STATUS_BYTE_INDEX);
 			if (TxStatusResult == SUCCESS) {
-				printf("SUCCESS\n\r");
+				//printf("SUCCESS\n\r");
 			} else {
-				printf("FAILURE\n\r");
+				//printf("FAILURE\n\r");
 				//RESEND THE TX DATA PACKET -- ADD CODE IN HERE
 			}
 		} else if (API_Ident == API_IDENTIFIER_Reset) {
