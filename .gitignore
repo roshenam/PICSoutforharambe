@@ -12,5 +12,6 @@
 /Outputs/*.htm
 /Outputs/*.bin
 /Outputs/*.sct
+/Outputs/*.iex
 /*.dep
 
