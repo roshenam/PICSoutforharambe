@@ -152,8 +152,6 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			}
 		
 			if ( ThisEvent.EventType == ES_PAIR) {
-				printf("PAIRED\r\n");
-				
 				// EventParam should be DOG_TAG number? (0x01, 0x02, or 0x03) or do we need to know DOG_TAG here?
 				
 				// send a REQ2PAIR packet 
@@ -190,6 +188,8 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			}
 			
 			if (ThisEvent.EventType == ES_DOG_ACK_RECEIVED ) {
+				printf("PAIRED\r\n");
+				
 				//light up eyes
 				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) |= (GPIO_PIN_7) ;
 				

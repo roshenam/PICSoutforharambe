@@ -28,7 +28,7 @@
 
 
 /*---------------------------- Module Functions ---------------------------*/
-static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType);
+static void ConstructPacket(uint8_t PacketType);
 static void InterpretPacket(uint8_t SizeOfData); 
 void ResetEncryptionIndex(void);
 uint8_t* GetIMUData(void);
@@ -40,6 +40,8 @@ static uint8_t* DataPacket_Rx;
 static uint8_t DataPacket_Tx[42];
 static uint8_t EncryptionIndex;
 static uint8_t IMU_Data[12];
+static uint8_t DestMSB;
+static uint8_t DestLSB;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -122,7 +124,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
 			printf("boutta send some shiiiittt \r\n");
 			// call ConstructPacket
 			uint8_t PacketType = ThisEvent.EventParam;
-			ConstructPacket(0x20, 0x8B, PacketType);
+			ConstructPacket(PacketType);
 
 	}
 
@@ -142,7 +144,7 @@ ES_Event RunComm_Service( ES_Event ThisEvent )
  Author
    Sarah Cabreros
 ****************************************************************************/
-static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType) {
+static void ConstructPacket(uint8_t PacketType) {
 		//printf("--------------CONSTRUCTING-----------\n\r");
 					ES_Event NewEvent;
 					
@@ -161,16 +163,22 @@ static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType
 					RunningSum += API_IDENTIFIER_Tx;
 					DataPacket_Tx[FRAME_ID_BYTE_INDEX] = FRAME_ID;
 					RunningSum += FRAME_ID;
-					DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = DestMSB; 
-					RunningSum += DestMSB;
-					DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = DestLSB; 
-					RunningSum += DestLSB;
 					DataPacket_Tx[OPTIONS_BYTE_INDEX_TX] = OPTIONS;
 					RunningSum += OPTIONS;
 	
 					switch (PacketType) {
 						case FARMER_DOG_REQ_2_PAIR:
 							printf("Req 2 Pair Construction (Comm Service) \n\r");
+						
+							// broadcast to everyone
+							DestMSB = 0xFF;
+							DestLSB = 0xFF;
+							DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = DestMSB; 
+							RunningSum += DestMSB;
+							DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = DestLSB; 
+							RunningSum += DestLSB;
+						
+						
 							//add the unique frame length
 							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = REQ_2_PAIR_LENGTH; // don't add to RunningSum
 						
@@ -195,6 +203,13 @@ static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType
 							
 						case FARMER_DOG_ENCR_KEY:
 							printf("Encryption Key Construction (Comm Service) \n\r");
+						
+							// add destination address
+							DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = DestMSB; 
+							RunningSum += DestMSB;
+							DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = DestLSB; 
+							RunningSum += DestLSB;
+						
 							//add the unique frame length
 							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = ENCR_KEY_LENGTH; // don't add to RunningSum
 						
@@ -221,6 +236,13 @@ static void ConstructPacket(uint8_t DestMSB, uint8_t DestLSB, uint8_t PacketType
 							
 						case FARMER_DOG_CTRL:
 							printf("Farmer Control Construction \n\r");
+						
+							// add destination address
+							DataPacket_Tx[DEST_ADDRESS_MSB_INDEX] = DestMSB; 
+							RunningSum += DestMSB;
+							DataPacket_Tx[DEST_ADDRESS_LSB_INDEX] = DestLSB; 
+							RunningSum += DestLSB;				
+						
 							//add the unique frame length
 							DataPacket_Tx[LENGTH_LSB_BYTE_INDEX] = CTRL_LENGTH; // don't add to RunningSum
 							
@@ -293,6 +315,11 @@ static void InterpretPacket(uint8_t SizeOfData) {
 					break;
 				case DOG_ACK :
 					NewEvent.EventType = ES_DOG_ACK_RECEIVED;
+					
+					// save source address to destination address)
+					DestMSB = *(DataPacket_Rx + SOURCE_ADDRESS_MSB_INDEX);
+					DestLSB = *(DataPacket_Rx + SOURCE_ADDRESS_LSB_INDEX);
+				
 					break;
 				case DOG_FARMER_RESET_ENCR :
 					NewEvent.EventType = ES_DOG_RESET_ENCR_RECEIVED;
