@@ -22,7 +22,8 @@
 
 /*----------------------------- Module Defines ----------------------------*/
 #define NUM_ENCRYPTION_BYTES 32
-
+#define PERIPHERAL_PIN		BIT5HI
+#define BRAKE_PIN					BIT2HI
 
 /*---------------------------- Module Functions ---------------------------*/
 static void CreateEncryptionKey(void);
@@ -36,7 +37,7 @@ static uint8_t MyPriority;
 
 static uint8_t EncryptionKey[NUM_ENCRYPTION_BYTES]; // array of 32 encryption keys 
 
-static uint8_t DogTag = 0x00;
+static uint8_t DogTag = 0x01;
 
 static uint16_t GameTimerLength;
 
@@ -71,15 +72,25 @@ bool InitFARMER_SM ( uint8_t Priority )
 	
 	Init_Accel();
 	
+	// Initialize LED/eyes pin
 	HWREG(SYSCTL_RCGCGPIO) |= SYSCTL_RCGCGPIO_R1;
 	while( (HWREG(SYSCTL_PRGPIO) & SYSCTL_PRGPIO_R1 ) != SYSCTL_PRGPIO_R1);
 	// Congifure the button input line as digital
 	HWREG( GPIO_PORTB_BASE + GPIO_O_DEN ) |= ( GPIO_PIN_7 );
 	// Configure the button line as an output line
 	HWREG( GPIO_PORTB_BASE + GPIO_O_DIR ) |= GPIO_PIN_7 ;
-	
-	HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+	HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ; // start low
   
+	// Initialize peripheral pin
+	HWREG( GPIO_PORTB_BASE + GPIO_O_DEN ) |= ( PERIPHERAL_PIN );
+	HWREG( GPIO_PORTB_BASE + GPIO_O_DIR ) &= ~PERIPHERAL_PIN ;
+	
+	// Initialize brake pin
+	HWREG(SYSCTL_RCGCGPIO) |= SYSCTL_RCGCGPIO_R0;
+	while( (HWREG(SYSCTL_PRGPIO) & SYSCTL_PRGPIO_R0 ) != SYSCTL_PRGPIO_R0);
+	HWREG( GPIO_PORTA_BASE + GPIO_O_DEN ) |= ( BRAKE_PIN );
+	HWREG( GPIO_PORTA_BASE + GPIO_O_DIR ) &= ~BRAKE_PIN ;
+	
 	return true;
 }
 
@@ -152,7 +163,8 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			}
 		
 			if ( ThisEvent.EventType == ES_PAIR) {
-				// EventParam should be DOG_TAG number? (0x01, 0x02, or 0x03) or do we need to know DOG_TAG here?
+				// read DOGTAG number
+				//DogTag = ;
 				
 				// send a REQ2PAIR packet 
 				ES_Event NewEvent;
@@ -344,11 +356,24 @@ uint8_t GetDogTag(void) {
 }
 
 uint8_t* GetSensorData(void) {
-	//static uint8_t Placeholder_Data[3] = {0x00, 0x00, 0x42};
 	static uint8_t Data[3];
 	Data[0] = Get_AccelFB();
 	Data[1] = Get_AccelRL();
-	Data[2] = 0x42;
-	//return &Placeholder_Data[0];
+	
+	// get input from brake and peripheral
+	uint8_t DigitalByte = 0;
+	
+	// read peripheral pin (tongue switch, PB5)
+	if ( (HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) & PERIPHERAL_PIN) == 0) { // if pin is LOW (button pressed)
+		DigitalByte |= BIT0HI;
+	} // else leave bit 0 low
+	
+	// read brake pin (green button, PA2)
+	if ( (HWREG( GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS) ) & BRAKE_PIN) == 0) { // if pin is LOW (switch pressed)
+		DigitalByte |= BIT1HI;
+	} // else leave bit 1 low	
+	
+	Data[2] = DigitalByte;
+	
 	return &Data[0];
 }

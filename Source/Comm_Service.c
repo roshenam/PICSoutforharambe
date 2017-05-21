@@ -263,6 +263,7 @@ static void ConstructPacket(uint8_t PacketType) {
 							// encrypt data THEN add data
 							for (int i = 0; i < 3; i++) {
 								uint8_t CurrentDataByte = *(DataToSend + i);
+								printf("Sending byte: %i\r\n", CurrentDataByte);
 								DataPacket_Tx[DATA_BYTE_INDEX_TX+i] = CurrentDataByte^(*(EncryptionData + EncryptionIndex));
 								RunningSum += CurrentDataByte^(*(EncryptionData + EncryptionIndex));
 								// increment encryption index
@@ -310,7 +311,7 @@ static void InterpretPacket(uint8_t SizeOfData) {
 					// get IMU data
 					for (int i = 0; i < 12; i++ ) {
 						IMU_Data[i] = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX + i + 1); // IMU data starts AFTER packet type byte
-						printf("data: %i\r\n", IMU_Data[i]);
+						//printf("IMU data: %i\r\n", IMU_Data[i]);
 					}
 					break;
 				case DOG_ACK :
