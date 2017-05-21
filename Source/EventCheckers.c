@@ -64,22 +64,25 @@ bool Check4Keystroke(void)
   if ( IsNewKeyReady() ) // new key waiting?
   {
     
-		//ES_Event ThisEvent;
+		ES_Event ThisEvent;
     //ThisEvent.EventType = ES_NEW_KEY;
-    //ThisEvent.EventParam = GetNewKey();
+    ThisEvent.EventParam = GetNewKey();
     //PostFARMER_SM( ThisEvent );
 		
-		if (GetNewKey() == 'd' || GetNewKey() == 'D') {
+		if (ThisEvent.EventParam == 'd' || ThisEvent.EventParam == 'D') {
 			printf("d\r\n");
-			ES_Event ThisEvent;
 			ThisEvent.EventType = ES_PAIR;
 			PostFARMER_SM(ThisEvent);
 		}
 		
-		else if (GetNewKey() == 'u' || GetNewKey() == 'U') {
+		else if (ThisEvent.EventParam == 'u' || ThisEvent.EventParam == 'U') {
 			printf("u\r\n");
-			ES_Event ThisEvent;
 			ThisEvent.EventType = ES_UNPAIR;
+			PostFARMER_SM(ThisEvent);
+		}
+		
+		else{
+			ThisEvent.EventType = ES_NEW_KEY;
 			PostFARMER_SM(ThisEvent);
 		}
     

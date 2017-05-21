@@ -301,12 +301,12 @@ static void InterpretPacket(uint8_t SizeOfData) {
 			NewEvent.EventParam = SizeOfData; //the frame length
 			PostFARMER_SM(NewEvent);
 		} else if (API_Ident == API_IDENTIFIER_Tx_Result) { 
-			//printf("RECEIVED A TRANSMISSION RESULT DATAPACKET (Comm_Service): ");
+			printf("RECEIVED A TRANSMISSION RESULT DATAPACKET (Comm_Service): ");
 			uint8_t TxStatusResult = *(DataPacket_Rx + TX_STATUS_BYTE_INDEX);
 			if (TxStatusResult == SUCCESS) {
-				//printf("SUCCESS\n\r");
+				printf("SUCCESS\n\r");
 			} else {
-				//printf("FAILURE\n\r");
+				printf("FAILURE\n\r");
 				//RESEND THE TX DATA PACKET -- ADD CODE IN HERE
 			}
 		} else if (API_Ident == API_IDENTIFIER_Reset) {

@@ -18,6 +18,7 @@
 #include "Constants.h"
 #include "Hardware.h"
 #include "FARMER_SM.h"
+#include "Accelerometers.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define NUM_ENCRYPTION_BYTES 32
@@ -64,8 +65,20 @@ bool InitFARMER_SM ( uint8_t Priority )
   MyPriority = Priority;
   
 	CurrentState = Wait2Pair;
+	//CurrentState = Debug;
 
 	printf("Initialized in FARMER_SM\r\n");
+	
+	Init_Accel();
+	
+	HWREG(SYSCTL_RCGCGPIO) |= SYSCTL_RCGCGPIO_R1;
+	while( (HWREG(SYSCTL_PRGPIO) & SYSCTL_PRGPIO_R1 ) != SYSCTL_PRGPIO_R1);
+	// Congifure the button input line as digital
+	HWREG( GPIO_PORTB_BASE + GPIO_O_DEN ) |= ( GPIO_PIN_7 );
+	// Configure the button line as an output line
+	HWREG( GPIO_PORTB_BASE + GPIO_O_DIR ) |= GPIO_PIN_7 ;
+	
+	HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
   
 	return true;
 }
@@ -117,6 +130,17 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
   switch ( CurrentState )
   {
 
+		case Debug:
+			if (ThisEvent.EventType == ES_NEW_KEY){
+				if (ThisEvent.EventParam == 'f'){
+					uint8_t FB_Accel = Get_AccelFB();
+				}
+				else if (ThisEvent.EventParam == 'r'){
+					uint8_t RL_Accel = Get_AccelRL();
+				}
+			}
+		break;
+			
     case Wait2Pair: 
 			printf("wait2pair \r\n");
  
@@ -147,7 +171,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
       
     break;
 
-		case Wait4PairResponse:      
+		case Wait4PairResponse:
 
 			if (ThisEvent.EventType == ES_UNPAIR) {
 				printf("UNPAIRED\r\n");
@@ -158,11 +182,17 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
 				printf("Lost communication, No ACK\r\n");
+				// turn off eyes
+				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+				
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
 			}
 			
 			if (ThisEvent.EventType == ES_DOG_ACK_RECEIVED ) {
+				//light up eyes
+				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) |= (GPIO_PIN_7) ;
+				
 				// generate ecryption key 
 				CreateEncryptionKey();
 				
@@ -194,6 +224,9 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			
 			if (ThisEvent.EventType == ES_UNPAIR) {
 				printf("UNPAIRED\r\n");
+				// turn off eyes
+				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+				
 				//if there is ever a place where we want to unpair, send this event to farmer_sm
 				//most likeley for debugging - add in a key-press event that sends this event
 				CurrentState = Wait2Pair;
@@ -201,12 +234,18 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == GAME_TIMER ) {
 				printf("GAME OVER\r\n");
+				// turn off eyes
+				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+				
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
 			}
 		
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
 				printf("Lost communication\r\n");
+				// turn off eyes
+				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+				
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
 			}
@@ -305,6 +344,11 @@ uint8_t GetDogTag(void) {
 }
 
 uint8_t* GetSensorData(void) {
-	static uint8_t Placeholder_Data[3] = {0x00, 0x00, 0x42};
-	return &Placeholder_Data[0];
+	//static uint8_t Placeholder_Data[3] = {0x00, 0x00, 0x42};
+	static uint8_t Data[3];
+	Data[0] = Get_AccelFB();
+	Data[1] = Get_AccelRL();
+	Data[2] = 0x42;
+	//return &Placeholder_Data[0];
+	return &Data[0];
 }

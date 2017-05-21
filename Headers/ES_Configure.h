@@ -343,5 +343,6 @@ typedef enum {  ES_NO_EVENT = 0,
 #define TRANSMIT_TIMER 2
 #define INTER_MESSAGE_TIMER 3
 #define LOST_COMM_TIMER	4
+#define TOUCHDEBOUNCE_TIMER 5
 
 #endif /* CONFIGURE_H */
