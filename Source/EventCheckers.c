@@ -37,7 +37,22 @@
 
 #include "FARMER_SM.h"
 
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+#include "inc/hw_gpio.h"
+#include "inc/hw_sysctl.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/pin_map.h"	// Define PART_TM4C123GH6PM in project
+#include "driverlib/gpio.h"
 
+// Pair button on PB4
+#define TOUCHBUTTON GPIO_PIN_4
+#define TOUCHBUTTON_LO BIT4LO
+#define TOUCHBUTTON_HI BIT4HI
+
+#define ALL_BITS (0xff<<2)
+
+static uint8_t LastButtonState = 0;
 
 /****************************************************************************
  Function
@@ -90,3 +105,45 @@ bool Check4Keystroke(void)
   }
   return false;
 }
+
+/****************************************************************************
+ Function
+   CheckTouchButton
+ Parameters
+   None
+ Returns
+   bool: true if a new event was posted
+ Description
+   Event checker for the Touch_SM service that detects rises and falls 
+	 in the input pin for the touch sensor
+
+ Author
+ R. MacPherson, 5/21/17
+****************************************************************************/
+bool CheckTouchButton (void) {
+	
+	// Local variables
+	bool ReturnVal = false;
+	uint8_t CurrentButtonState;
+	uint16_t CurrTime = ES_Timer_GetTime();
+	// Get the CurrentButtonState from the input line
+	CurrentButtonState = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & TOUCHBUTTON_HI );
+	//printf("reset button state is %d\r\n",CurrentButtonState);
+	// If the state of the Button input line has changed
+	if ( CurrentButtonState != LastButtonState ){
+		ES_Event ThisEvent;
+		ThisEvent.EventParam = CurrTime;
+		// If the current state of the input line is high
+		if ( CurrentButtonState == TOUCHBUTTON_HI ){
+			// PostEvent ResetButtonUp with parameter of the Current Time
+    		ThisEvent.EventType = TOUCHBUTTON_UP;}
+		else{
+			ThisEvent.EventType = TOUCHBUTTON_DOWN;}
+		
+		PostTouch_SM(ThisEvent); 	
+    ReturnVal = true; }
+		//printf("reset button event checker\r\n");
+		LastButtonState = CurrentButtonState;
+		return ReturnVal;
+}
+

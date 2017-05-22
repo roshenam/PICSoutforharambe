@@ -24,11 +24,15 @@
 #define NUM_ENCRYPTION_BYTES 32
 #define PERIPHERAL_PIN		BIT5HI
 #define BRAKE_PIN					BIT2HI
+#define DOGSEL1							BIT3HI
+#define DOGSEL2							BIT4HI
 
 /*---------------------------- Module Functions ---------------------------*/
 static void CreateEncryptionKey(void);
 uint8_t* GetEncryptionKey(void);
 uint8_t* GetSensorData(void); // placeholder
+static void Eyes_On(void);
+static void Eyes_Off(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 static FARMERState_t CurrentState;
@@ -40,6 +44,8 @@ static uint8_t EncryptionKey[NUM_ENCRYPTION_BYTES]; // array of 32 encryption ke
 static uint8_t DogTag = 0x01;
 
 static uint16_t GameTimerLength;
+
+static uint8_t LastPeriphState;
 
 
 /*------------------------------ Module Code ------------------------------*/
@@ -65,8 +71,8 @@ bool InitFARMER_SM ( uint8_t Priority )
 {
   MyPriority = Priority;
   
-	CurrentState = Wait2Pair;
-	//CurrentState = Debug;
+	//CurrentState = Wait2Pair;
+	CurrentState = Debug;
 
 	printf("Initialized in FARMER_SM\r\n");
 	
@@ -75,21 +81,23 @@ bool InitFARMER_SM ( uint8_t Priority )
 	// Initialize LED/eyes pin
 	HWREG(SYSCTL_RCGCGPIO) |= SYSCTL_RCGCGPIO_R1;
 	while( (HWREG(SYSCTL_PRGPIO) & SYSCTL_PRGPIO_R1 ) != SYSCTL_PRGPIO_R1);
-	// Congifure the button input line as digital
+	// Congifure the LED line as digital
 	HWREG( GPIO_PORTB_BASE + GPIO_O_DEN ) |= ( GPIO_PIN_7 );
-	// Configure the button line as an output line
+	// Configure the LED line as an output line
 	HWREG( GPIO_PORTB_BASE + GPIO_O_DIR ) |= GPIO_PIN_7 ;
 	HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ; // start low
   
-	// Initialize peripheral pin
+	// Initialize peripheral pin (input)
 	HWREG( GPIO_PORTB_BASE + GPIO_O_DEN ) |= ( PERIPHERAL_PIN );
-	HWREG( GPIO_PORTB_BASE + GPIO_O_DIR ) &= ~PERIPHERAL_PIN ;
+	HWREG( GPIO_PORTB_BASE + GPIO_O_DIR ) &= ~(PERIPHERAL_PIN) ;
+	//Initialize peripheral value to whatever it starts out as
+	LastPeriphState = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & PERIPHERAL_PIN );
 	
-	// Initialize brake pin
+	// Initialize brake pin (input)
 	HWREG(SYSCTL_RCGCGPIO) |= SYSCTL_RCGCGPIO_R0;
 	while( (HWREG(SYSCTL_PRGPIO) & SYSCTL_PRGPIO_R0 ) != SYSCTL_PRGPIO_R0);
-	HWREG( GPIO_PORTA_BASE + GPIO_O_DEN ) |= ( BRAKE_PIN );
-	HWREG( GPIO_PORTA_BASE + GPIO_O_DIR ) &= ~BRAKE_PIN ;
+	HWREG( GPIO_PORTA_BASE + GPIO_O_DEN ) |= ( BRAKE_PIN | DOGSEL1 | DOGSEL2 );
+	HWREG( GPIO_PORTA_BASE + GPIO_O_DIR ) &= ~(BRAKE_PIN | DOGSEL1 | DOGSEL2) ;
 	
 	return true;
 }
@@ -150,6 +158,16 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 					uint8_t RL_Accel = Get_AccelRL();
 				}
 			}
+			if (ThisEvent.EventType == DB_TOUCHBUTTONUP){
+				Eyes_On();
+				uint8_t brake = (HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & BRAKE_PIN );
+				uint8_t periph = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & PERIPHERAL_PIN );
+				uint8_t DogState = GetDogTag();
+				printf("the state of the green button is %d\r\n",brake);
+				printf("the state of the tongue button is %d\r\n",periph);
+				printf("the dog tag is %d\r\n",DogState);
+			}
+				
 		break;
 			
     case Wait2Pair: 
@@ -192,8 +210,8 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
 				printf("Lost communication, No ACK\r\n");
-				// turn off eyes
-				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+				
+				Eyes_Off();
 				
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
@@ -202,8 +220,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			if (ThisEvent.EventType == ES_DOG_ACK_RECEIVED ) {
 				printf("PAIRED\r\n");
 				
-				//light up eyes
-				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) |= (GPIO_PIN_7) ;
+				Eyes_On();
 				
 				// generate ecryption key 
 				CreateEncryptionKey();
@@ -236,8 +253,8 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			
 			if (ThisEvent.EventType == ES_UNPAIR) {
 				printf("UNPAIRED\r\n");
-				// turn off eyes
-				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+				
+				Eyes_Off();
 				
 				//if there is ever a place where we want to unpair, send this event to farmer_sm
 				//most likeley for debugging - add in a key-press event that sends this event
@@ -246,8 +263,8 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == GAME_TIMER ) {
 				printf("GAME OVER\r\n");
-				// turn off eyes
-				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+				
+				Eyes_Off();
 				
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
@@ -255,8 +272,8 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 		
 			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
 				printf("Lost communication\r\n");
-				// turn off eyes
-				HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+				
+				Eyes_Off();
 				
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
@@ -352,11 +369,25 @@ uint8_t* GetEncryptionKey(void) {
      Sarah Cabreros
 ****************************************************************************/
 uint8_t GetDogTag(void) {
+	static uint8_t DogLine1;
+	static uint8_t DogLine2;
+	DogLine1 = ( HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & DOGSEL1 );
+	DogLine2 = ( HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & DOGSEL2 );
+	if( DogLine1 ){
+		DogTag = 0x01;
+	}
+	else if( DogLine2 ){
+		DogTag = 0x03;
+	}
+	else{
+		DogTag = 0x02;
+	}
 	return DogTag;
 }
 
 uint8_t* GetSensorData(void) {
 	static uint8_t Data[3];
+	static uint8_t CurrPeriphState;
 	Data[0] = Get_AccelFB();
 	Data[1] = Get_AccelRL();
 	
@@ -364,9 +395,13 @@ uint8_t* GetSensorData(void) {
 	uint8_t DigitalByte = 0;
 	
 	// read peripheral pin (tongue switch, PB5)
-	if ( (HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) & PERIPHERAL_PIN) == 0) { // if pin is LOW (button pressed)
+	CurrPeriphState = (HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) & PERIPHERAL_PIN);
+	if (CurrPeriphState == LastPeriphState){ // if pin has not changed
+	}
+	else{
 		DigitalByte |= BIT0HI;
-	} // else leave bit 0 low
+	} 
+	LastPeriphState = CurrPeriphState;
 	
 	// read brake pin (green button, PA2)
 	if ( (HWREG( GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS) ) & BRAKE_PIN) == 0) { // if pin is LOW (switch pressed)
@@ -377,3 +412,16 @@ uint8_t* GetSensorData(void) {
 	
 	return &Data[0];
 }
+
+static void Eyes_On( void ){
+	//light up eyes
+	HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) |= (GPIO_PIN_7) ;
+}
+
+static void Eyes_Off( void ){
+	//light up eyes
+	HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
+}
+
+
+	

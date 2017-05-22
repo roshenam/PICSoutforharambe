@@ -142,7 +142,5 @@ static uint8_t Scale_Accel( uint32_t AccelToScale )
 	else{
 		return (MAX_EFFORT*MAX_ACCEL)/(MAX_ACCEL-MIN_ACCEL) - (MAX_EFFORT*AccelToScale)/(MAX_ACCEL-MIN_ACCEL);
 	}
-		
-	return ADResults[ACCELFB_PIN];
 }
 

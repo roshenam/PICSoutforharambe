@@ -5,7 +5,7 @@
 
  ****************************************************************************/
 
-#ifndef TouchBSM_H
+#ifndef TouchSM_H
 #define TouchSM_H
 
 // Event Definitions

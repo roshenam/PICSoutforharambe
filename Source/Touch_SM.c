@@ -40,8 +40,8 @@
 // Data pins
 // Pair button on PB4
 #define TOUCHBUTTON GPIO_PIN_4
-#define RESETBUTTON_LO BIT4LO
-#define RESETBUTTON_HI BIT4HI
+#define TOUCHBUTTON_LO BIT4LO
+#define TOUCHBUTTON_HI BIT4HI
 
 #define ALL_BITS (0xff<<2)
 
@@ -53,7 +53,6 @@
 /*---------------------------- Module Variables ---------------------------*/
 // with the introduction of Gen2, we need a module level Priority variable
 static uint8_t MyPriority;
-static uint8_t LastButtonState;
 static ButtonDebounce_t CurrentState = InitButtonDebounce;
 
 // add a deferral queue for up to 3 pending deferrals +1 to allow for overhead
@@ -93,14 +92,14 @@ bool InitTouch_SM ( uint8_t Priority )
 	HWREG( GPIO_PORTB_BASE + GPIO_O_DIR ) &= ~TOUCHBUTTON;
 
 	// Sample port line and use it to initialize the LastButtonState variable
-	LastButtonState = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & TOUCHBUTTON_HI );
+	//LastButtonState = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & TOUCHBUTTON_HI );
 	CurrentState = Debouncing;
 	
 	ES_Timer_InitTimer(TOUCHDEBOUNCE_TIMER, DEBOUNCE_DELAY);
 	
   // Post Event ES_Init to ButtonDebounce queue (this service)
   ThisEvent.EventType = ES_INIT;
-	PostButtonDebounce( ThisEvent );
+	PostTouch_SM( ThisEvent );
 	
   if (ES_PostToService( MyPriority, ThisEvent) == true)
   {  
@@ -174,55 +173,19 @@ ES_Event RunTouch_SM( ES_Event ThisEvent ) {
 					PostFARMER_SM( Button_Event );
 					break;
 				case TOUCHBUTTON_DOWN :
-					printf("touch button down in TBD\r\n");
+					//printf("touch button down in TBD\r\n");
 					ES_Timer_InitTimer( TOUCHDEBOUNCE_TIMER, DEBOUNCE_DELAY);
 					CurrentState = Debouncing;	
 					break;
 				default :
 					break;
 			}
-		return ReturnEvent;
+				break;
+			default:
+				break;
 	}
+	return ReturnEvent;
+}
 				
 
-/****************************************************************************
- Function
-   CheckResetButton
- Parameters
-   None
- Returns
-   bool: true if a new event was posted
- Description
-   Event checker for the ButtonDebounce service that detects rises and falls 
-	 in the input pin for the reset button
 
- Author
- R. MacPherson, 11/8/16, 17:54
-****************************************************************************/
-bool CheckResetButton (void) {
-	
-	// Local variables
-	bool ReturnVal = false;
-	uint8_t CurrentButtonState;
-	uint16_t CurrTime = ES_Timer_GetTime();
-	// Get the CurrentButtonState from the input line
-	CurrentButtonState = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & RESETBUTTON_HI );
-	//printf("reset button state is %d\r\n",CurrentButtonState);
-	// If the state of the Button input line has changed
-	if ( CurrentButtonState != LastResetButtonState ){
-		printf("Reset pin is different\r\n");
-		ES_Event ThisEvent;
-		ThisEvent.EventParam = CurrTime;
-		// If the current state of the input line is high
-		if ( CurrentButtonState == RESETBUTTON_HI ){
-			// PostEvent ResetButtonUp with parameter of the Current Time
-    		ThisEvent.EventType = RESETBUTTON_UP;}
-		else{
-			ThisEvent.EventType = RESETBUTTON_DOWN;}
-		
-		PostButtonDebounce(ThisEvent); 	
-    ReturnVal = true; }
-		//printf("reset button event checker\r\n");
-		LastResetButtonState = CurrentButtonState;
-		return ReturnVal;
-}

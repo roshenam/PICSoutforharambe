@@ -30,7 +30,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 4
+#define NUM_SERVICES 5
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -93,11 +93,11 @@
 // These are the definitions for Service 4
 #if NUM_SERVICES > 4
 // the header file with the public function prototypes
-#define SERV_4_HEADER "TestHarnessService4.h"
+#define SERV_4_HEADER "Touch_SM.h"
 // the name of the Init function
-#define SERV_4_INIT InitTestHarnessService4
+#define SERV_4_INIT InitTouch_SM
 // the name of the run function
-#define SERV_4_RUN RunTestHarnessService4
+#define SERV_4_RUN RunTouch_SM
 // How big should this services Queue be?
 #define SERV_4_QUEUE_SIZE 3
 #endif
@@ -251,7 +251,7 @@
 // Universal events occupy the lowest entries, followed by user-defined events
 typedef enum {  ES_NO_EVENT = 0,
                 ES_ERROR,  /* used to indicate an error from the service */
-                //ES_INIT,   /* used to transition from initial pseudo-state */
+                ES_INIT,   /* used to transition from initial pseudo-state */
                 ES_TIMEOUT, /* signals that the timer has expired */
                 ES_SHORT_TIMEOUT, /* signals that a short timer has expired */
                 /* User-defined events start here */
@@ -265,7 +265,11 @@ typedef enum {  ES_NO_EVENT = 0,
 								// Comm_Service
 								ES_SENDPACKET,
 								// FARMER_SM received messages
-								ES_DOG_REPORT_RECEIVED, ES_DOG_ACK_RECEIVED, ES_DOG_RESET_ENCR_RECEIVED
+								ES_DOG_REPORT_RECEIVED, ES_DOG_ACK_RECEIVED, ES_DOG_RESET_ENCR_RECEIVED,
+								// Touch button debounce events
+								TOUCHBUTTON_UP,
+								TOUCHBUTTON_DOWN,
+								DB_TOUCHBUTTONUP
 								
 				} ES_EventTyp_t ;
 
@@ -305,7 +309,7 @@ typedef enum {  ES_NO_EVENT = 0,
 
 /****************************************************************************/
 // This is the list of event checking functions 
-#define EVENT_CHECK_LIST Check4Keystroke
+#define EVENT_CHECK_LIST Check4Keystroke, CheckTouchButton
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -319,7 +323,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define TIMER2_RESP_FUNC PostTransmit_SM
 #define TIMER3_RESP_FUNC PostFARMER_SM
 #define TIMER4_RESP_FUNC PostFARMER_SM
-#define TIMER5_RESP_FUNC TIMER_UNUSED
+#define TIMER5_RESP_FUNC PostTouch_SM
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
 #define TIMER8_RESP_FUNC TIMER_UNUSED
