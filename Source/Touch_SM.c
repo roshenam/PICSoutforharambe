@@ -54,6 +54,7 @@
 // with the introduction of Gen2, we need a module level Priority variable
 static uint8_t MyPriority;
 static ButtonDebounce_t CurrentState = InitButtonDebounce;
+static bool Pair;
 
 // add a deferral queue for up to 3 pending deferrals +1 to allow for overhead
 //static ES_Event DeferralQueue[3+1];
@@ -91,6 +92,7 @@ bool InitTouch_SM ( uint8_t Priority )
 	// Configure the button line as an input line
 	HWREG( GPIO_PORTB_BASE + GPIO_O_DIR ) &= ~TOUCHBUTTON;
 
+	Pair = Get_PairCommand();
 	// Sample port line and use it to initialize the LastButtonState variable
 	//LastButtonState = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & TOUCHBUTTON_HI );
 	CurrentState = Debouncing;
@@ -155,6 +157,7 @@ ES_Event RunTouch_SM( ES_Event ThisEvent ) {
 	
   ES_Event ReturnEvent;
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
+	Pair = Get_PairCommand();
 	
 	switch( CurrentState ){
 		case Debouncing :
@@ -168,8 +171,14 @@ ES_Event RunTouch_SM( ES_Event ThisEvent ) {
 					printf("touch button up in TBD\r\n");
 					ES_Timer_InitTimer( TOUCHDEBOUNCE_TIMER, DEBOUNCE_DELAY );
 					CurrentState = Debouncing;
-					Button_Event.EventType = DB_TOUCHBUTTONUP;
+					//Button_Event.EventType = DB_TOUCHBUTTONUP;
 					Button_Event.EventParam = ES_Timer_GetTime();
+					if( Pair ){
+						Button_Event.EventType = ES_PAIR;
+					}
+					else{
+						Button_Event.EventType = ES_UNPAIR;
+					}
 					PostFARMER_SM( Button_Event );
 					break;
 				case TOUCHBUTTON_DOWN :

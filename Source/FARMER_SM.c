@@ -47,6 +47,7 @@ static uint16_t GameTimerLength;
 
 static uint8_t LastPeriphState;
 
+static bool Send_Pair = true;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -71,8 +72,8 @@ bool InitFARMER_SM ( uint8_t Priority )
 {
   MyPriority = Priority;
   
-	//CurrentState = Wait2Pair;
-	CurrentState = Debug;
+	CurrentState = Wait2Pair;
+	//CurrentState = Debug;
 
 	printf("Initialized in FARMER_SM\r\n");
 	
@@ -243,6 +244,9 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				// start GameTimer
 				ES_Timer_InitTimer(GAME_TIMER, 10000);
 				
+				// switch Pair bool state 
+				Send_Pair = false;
+				
 				// go to Paired state
 				CurrentState = Paired;
 			}
@@ -256,6 +260,9 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				
 				Eyes_Off();
 				
+				// switch Pair bool state 
+				Send_Pair = true;
+				
 				//if there is ever a place where we want to unpair, send this event to farmer_sm
 				//most likeley for debugging - add in a key-press event that sends this event
 				CurrentState = Wait2Pair;
@@ -265,6 +272,9 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				printf("GAME OVER\r\n");
 				
 				Eyes_Off();
+
+				// switch Pair bool state 
+				Send_Pair = true;
 				
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
@@ -274,6 +284,9 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				printf("Lost communication\r\n");
 				
 				Eyes_Off();
+				
+				// switch Pair bool state 
+				Send_Pair = true;
 				
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
@@ -374,7 +387,8 @@ uint8_t GetDogTag(void) {
 	DogLine1 = ( HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & DOGSEL1 );
 	DogLine2 = ( HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & DOGSEL2 );
 	if( DogLine1 ){
-		DogTag = 0x01;
+		//DogTag = 0x01;
+		DogTag = 26;
 	}
 	else if( DogLine2 ){
 		DogTag = 0x03;
@@ -412,6 +426,11 @@ uint8_t* GetSensorData(void) {
 	
 	return &Data[0];
 }
+
+bool Get_PairCommand( void ){
+	return Send_Pair;
+}
+
 
 static void Eyes_On( void ){
 	//light up eyes

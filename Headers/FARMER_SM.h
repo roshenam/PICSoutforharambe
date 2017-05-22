@@ -14,5 +14,6 @@ uint8_t* GetSensorData(void); // placeholder
 bool InitFARMER_SM ( uint8_t Priority );
 bool PostFARMER_SM( ES_Event ThisEvent );
 ES_Event RunFARMER_SM( ES_Event ThisEvent );
+bool Get_PairCommand( void );
 
 #endif 
