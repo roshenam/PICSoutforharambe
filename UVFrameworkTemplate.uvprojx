@@ -558,6 +558,21 @@
               <FileType>1</FileType>
               <FilePath>.\Source\ADMulti.c</FilePath>
             </File>
+            <File>
+              <FileName>Touch_SM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\Touch_SM.c</FilePath>
+            </File>
+            <File>
+              <FileName>ShiftRegModule.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\ShiftRegModule.c</FilePath>
+            </File>
+            <File>
+              <FileName>EnablePA25_PB23_PD7_PF0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\EnablePA25_PB23_PD7_PF0.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -712,6 +727,21 @@
               <FileName>ADMulti.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\ADMulti.h</FilePath>
+            </File>
+            <File>
+              <FileName>Touch_SM.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Touch_SM.h</FilePath>
+            </File>
+            <File>
+              <FileName>EnablePA25_PB23_PD7_PF0.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\EnablePA25_PB23_PD7_PF0.h</FilePath>
+            </File>
+            <File>
+              <FileName>ShiftRegModule.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\ShiftRegModule.h</FilePath>
             </File>
           </Files>
         </Group>

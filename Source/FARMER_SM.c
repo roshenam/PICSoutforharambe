@@ -19,6 +19,8 @@
 #include "Hardware.h"
 #include "FARMER_SM.h"
 #include "Accelerometers.h"
+#include "ShiftRegModule.h"
+#include "EnablePA25_PB23_PD7_PF0.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define NUM_ENCRYPTION_BYTES 32
@@ -26,6 +28,8 @@
 #define BRAKE_PIN					BIT2HI
 #define DOGSEL1							BIT3HI
 #define DOGSEL2							BIT4HI
+#define GYROZ_MSB 10
+#define GYROZ_LSB 11
 
 /*---------------------------- Module Functions ---------------------------*/
 static void CreateEncryptionKey(void);
@@ -33,6 +37,7 @@ uint8_t* GetEncryptionKey(void);
 uint8_t* GetSensorData(void); // placeholder
 static void Eyes_On(void);
 static void Eyes_Off(void);
+static uint8_t IMU2LED( uint8_t* IMU_address );
 
 /*---------------------------- Module Variables ---------------------------*/
 static FARMERState_t CurrentState;
@@ -48,6 +53,18 @@ static uint16_t GameTimerLength;
 static uint8_t LastPeriphState;
 
 static bool Send_Pair = true;
+
+static uint8_t* IMU_Data;
+
+static uint8_t IMU_LED_value = 0;
+
+static uint8_t LED_values[8] = {BIT0HI, (BIT0HI | BIT1HI), (BIT0HI | BIT1HI | BIT2HI),
+																(BIT0HI | BIT1HI | BIT2HI | BIT3HI), 
+																(BIT0HI | BIT1HI | BIT2HI | BIT3HI | BIT4HI),
+																(BIT0HI | BIT1HI | BIT2HI | BIT3HI | BIT4HI | BIT5HI),
+																(BIT0HI | BIT1HI | BIT2HI | BIT3HI | BIT4HI | BIT5HI | BIT6HI), 0xff};
+
+static uint16_t IMU_ranges[7] = {500, 1000, 1500, 2000, 2500, 3000, 3500};
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -77,7 +94,14 @@ bool InitFARMER_SM ( uint8_t Priority )
 
 	printf("Initialized in FARMER_SM\r\n");
 	
+	PortFunctionInit();
 	Init_Accel();
+	
+	SR_Init();
+	SR_Write( 0 );
+	
+	// Get address to IMU data array
+	IMU_Data = GetIMUData();
 	
 	// Initialize LED/eyes pin
 	HWREG(SYSCTL_RCGCGPIO) |= SYSCTL_RCGCGPIO_R1;
@@ -154,9 +178,35 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			if (ThisEvent.EventType == ES_NEW_KEY){
 				if (ThisEvent.EventParam == 'f'){
 					uint8_t FB_Accel = Get_AccelFB();
+					SR_Write(0);
 				}
 				else if (ThisEvent.EventParam == 'r'){
 					uint8_t RL_Accel = Get_AccelRL();
+					SR_Write(5);
+				}
+				else if( ThisEvent.EventParam == '1' ){
+					SR_Write( 1 );
+				}
+				else if (ThisEvent.EventParam == '2' ){
+					SR_Write( 2 );
+				}
+				else if( ThisEvent.EventParam == '3' ){
+					SR_Write( 3 );
+				}
+				else if (ThisEvent.EventParam == '4' ){
+					SR_Write( 4 );
+				}
+				else if( ThisEvent.EventParam == '5' ){
+					SR_Write( 5 );
+				}
+				else if (ThisEvent.EventParam == '6' ){
+					SR_Write( 6 );
+				}
+				else if( ThisEvent.EventParam == '7' ){
+					SR_Write( 7 );
+				}
+				else if (ThisEvent.EventParam == '8' ){
+					SR_Write( 8 );
 				}
 			}
 			if (ThisEvent.EventType == DB_TOUCHBUTTONUP){
@@ -242,7 +292,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
 				
 				// start GameTimer
-				ES_Timer_InitTimer(GAME_TIMER, 10000);
+				//ES_Timer_InitTimer(GAME_TIMER, 10000);
 				
 				// switch Pair bool state 
 				Send_Pair = false;
@@ -304,6 +354,10 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 			}
 			
 			if ( ThisEvent.EventType == ES_DOG_REPORT_RECEIVED ) {
+				// change LED display values
+				IMU_LED_value = IMU2LED( IMU_Data );
+				SR_Write( IMU_LED_value );
+				
 				// start LOST_COMM timer
 				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
 			}
@@ -388,13 +442,20 @@ uint8_t GetDogTag(void) {
 	DogLine2 = ( HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & DOGSEL2 );
 	if( DogLine1 ){
 		//DogTag = 0x01;
-		DogTag = 26;
+		//DogTag = 26;
+		DogTag = 39;
+		printf("Dog Tag is %d\r\n",DogTag);
+		//DogTag = 4;
 	}
 	else if( DogLine2 ){
 		DogTag = 0x03;
+		printf("Dog Tag is 3\r\n");
+		//DogTag = 4;
 	}
 	else{
 		DogTag = 0x02;
+		printf("Dog Tag is 2\r\n");
+		//DogTag = 4;
 	}
 	return DogTag;
 }
@@ -441,6 +502,33 @@ static void Eyes_Off( void ){
 	//light up eyes
 	HWREG( GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) &= ~(GPIO_PIN_7) ;
 }
+
+static uint8_t IMU2LED( uint8_t* IMU_address ){
+	uint8_t Gyro_MSB = *(IMU_address+GYROZ_MSB);
+	uint8_t Gyro_LSB = *(IMU_address+GYROZ_LSB);
+	uint16_t GyroData_unsigned = ((Gyro_MSB<<8) | Gyro_LSB);
+	int16_t GyroData = (int16_t)GyroData_unsigned;
+	if( abs(GyroData) < IMU_ranges[0] )
+		return LED_values[0];
+	else if( abs(GyroData) < IMU_ranges[1] )
+		return LED_values[1];
+	else if( abs(GyroData) < IMU_ranges[2] )
+		return LED_values[2];
+	else if( abs(GyroData) < IMU_ranges[3] )
+		return LED_values[3];
+	else if( abs(GyroData) < IMU_ranges[4] )
+		return LED_values[4];
+	else if( abs(GyroData) < IMU_ranges[5] )
+		return LED_values[5];
+	else if( abs(GyroData) < IMU_ranges[6] )
+		return LED_values[6];
+	else
+		return LED_values[7];
+
+}
+
+
+
 
 
 	

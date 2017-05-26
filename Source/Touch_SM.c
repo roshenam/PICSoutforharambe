@@ -35,7 +35,7 @@
 #define TWO_SEC (ONE_SEC*2)
 #define FIVE_SEC (ONE_SEC*5)
 #define QUARTER_SEC (ONE_SEC/4)
-#define DEBOUNCE_DELAY (ONE_SEC/8)
+#define DEBOUNCE_DELAY (ONE_SEC/4)
 
 // Data pins
 // Pair button on PB4
