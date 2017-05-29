@@ -93,6 +93,7 @@ bool InitFARMER_SM ( uint8_t Priority )
   
 	CurrentState = Wait2Pair;
 	//CurrentState = Debug;
+	//ES_Timer_InitTimer(DEBUG_TIMER, 500);
 
 	printf("Initialized in FARMER_SM\r\n");
 	
@@ -177,13 +178,20 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
   {
 
 		case Debug:
+			if ((ThisEvent.EventType == ES_TIMEOUT) & (ThisEvent.EventParam == DEBUG_TIMER)){
+				//Get_AccelHead();
+				//Get_AccelTail();
+				Get_FB();
+				Get_RL();
+				ES_Timer_InitTimer( DEBUG_TIMER, 950 );
+			}
 			if (ThisEvent.EventType == ES_NEW_KEY){
 				if (ThisEvent.EventParam == 'f'){
-					uint8_t FB_Accel = Get_AccelFB();
+					uint8_t FB_Accel = Get_AccelHead();
 					SR_Write(0);
 				}
 				else if (ThisEvent.EventParam == 'r'){
-					uint8_t RL_Accel = Get_AccelRL();
+					uint8_t RL_Accel = Get_AccelTail();
 					SR_Write(5);
 				}
 				else if( ThisEvent.EventParam == '1' ){
@@ -520,8 +528,8 @@ uint8_t GetDogTag(void) {
 uint8_t* GetSensorData(void) {
 	static uint8_t Data[3];
 	//static uint8_t CurrPeriphState;
-	Data[0] = Get_AccelFB();
-	Data[1] = Get_AccelRL();
+	Data[0] = Get_FB();
+	Data[1] = Get_RL();
 	
 	// get input from brake and peripheral
 	uint8_t DigitalByte = 0;

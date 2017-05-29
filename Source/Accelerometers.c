@@ -24,17 +24,22 @@
 #define MIN_EFFORT 0
 #define MAX_ANALOG 4095
 #define MIN_ANALOG 0
-#define MAX_ACCEL 2300
-#define MIN_ACCEL 700
-
+#define MAX_ACCEL_HEAD 2300
+#define MAX_ACCEL_TAIL 1800
+#define MIN_ACCEL_HEAD 840
+#define MIN_ACCEL_TAIL 840
+#define TAIL 1
+#define HEAD 0
+#define MIDDLE 127
 /*---------------------------- Module Functions ---------------------------*/
-static uint8_t Scale_Accel( uint32_t AccelToScale );
+static uint8_t Scale_Accel( uint32_t AccelToScale, uint8_t Tail );
 
 
 /*---------------------------- Module Variables ---------------------------*/
-static uint8_t FB_Effort;
-static uint8_t RL_Effort;
+static uint8_t Head_Effort;
+static uint8_t Tail_Effort;
 static uint32_t ADResults[4];
+
 
 
 /*------------------------------ Module Code ------------------------------*/
@@ -62,7 +67,7 @@ void Init_Accel ( void )
 
 /****************************************************************************
  Function
-     Get_AccelRL
+     Get_AccelTail
 
  Parameters
      none
@@ -77,19 +82,19 @@ void Init_Accel ( void )
  Author
      Roshena MacPherson
 ****************************************************************************/
-uint8_t Get_AccelRL( void )
+uint8_t Get_AccelTail( void )
 {
   ADC_MultiRead(ADResults);
 	
 	// Do scaling fro 0-255
-	RL_Effort = Scale_Accel(ADResults[ACCELRL_PIN]);
-	printf("RL Accelerometer value is %d\r\n",RL_Effort);
-	return RL_Effort;
+	Tail_Effort = Scale_Accel(ADResults[ACCELRL_PIN], TAIL);
+	printf("RL value is %d, scaled is %d\r\n",Tail_Effort, ADResults[ACCELRL_PIN]);
+	return Tail_Effort;
 }
 
 /****************************************************************************
  Function
-     Get_AccelFB
+     Get_AccelHead
 
  Parameters
      none
@@ -104,14 +109,68 @@ uint8_t Get_AccelRL( void )
  Author
      Roshena MacPherson
 ****************************************************************************/
-uint8_t Get_AccelFB( void )
+uint8_t Get_AccelHead( void )
 {
   ADC_MultiRead(ADResults);
 	
 	// Do scaling from 0-255
-	FB_Effort = Scale_Accel(ADResults[ACCELFB_PIN]);
-	printf("FB Accelerometer value is %d\r\n",FB_Effort);
-	return FB_Effort;
+	Head_Effort = Scale_Accel(ADResults[ACCELFB_PIN], HEAD);
+	printf("FB value is %d, unscaled is %d\r\n",Head_Effort, ADResults[ACCELFB_PIN]);
+	return Head_Effort;
+}
+
+/****************************************************************************
+ Function
+     Get_FB
+
+ Parameters
+     none
+
+ Returns
+     FB value 
+
+ Description
+     
+ Notes
+
+ Author
+     Roshena MacPherson
+****************************************************************************/
+uint8_t Get_FB( void )
+{
+	uint8_t Left = Get_AccelHead();
+	uint8_t Right = Get_AccelTail();
+
+	printf("Mean is %d\r\n",((Left/2) + (Right/2)));
+	return ((Left/2) + (Right/2));
+}
+
+/****************************************************************************
+ Function
+     Get_RL
+
+ Parameters
+     none
+
+ Returns
+     FB value 
+
+ Description
+     
+ Notes
+
+ Author
+     Roshena MacPherson
+****************************************************************************/
+uint8_t Get_RL( void )
+{
+	uint8_t Left = Get_AccelHead();
+	uint8_t Right = Get_AccelTail();
+
+	int Delta = Left-Right;
+	
+	printf("LR is %d\r\n",(Delta*MAX_EFFORT/(2*MAX_EFFORT) + MIDDLE));
+	return (Delta*MAX_EFFORT/(2*MAX_EFFORT) + MIDDLE);
 }
 
 /****************************************************************************
@@ -131,16 +190,28 @@ uint8_t Get_AccelFB( void )
  Author
      Roshena MacPherson
 ****************************************************************************/
-static uint8_t Scale_Accel( uint32_t AccelToScale )
+static uint8_t Scale_Accel( uint32_t AccelToScale, uint8_t Tail )
 {
-  if( AccelToScale > MAX_ACCEL ){
-		return MAX_EFFORT;
-	}
-	else if( AccelToScale < MIN_ACCEL ){
-		return MIN_EFFORT;
+	uint16_t Max_Accel;
+	uint16_t Min_Accel;
+	
+	if( Tail ){
+		Max_Accel = MAX_ACCEL_TAIL;
+		Min_Accel = MIN_ACCEL_TAIL;
 	}
 	else{
-		return (MAX_EFFORT*MAX_ACCEL)/(MAX_ACCEL-MIN_ACCEL) - (MAX_EFFORT*AccelToScale)/(MAX_ACCEL-MIN_ACCEL);
+		Max_Accel = MAX_ACCEL_HEAD;
+		Min_Accel = MIN_ACCEL_HEAD;
+	}
+		
+  if( AccelToScale > Max_Accel ){
+		return MIN_EFFORT;
+	}
+	else if( AccelToScale < Min_Accel ){
+		return MAX_EFFORT;
+	}
+	else{
+		return (MAX_EFFORT*Max_Accel)/(Max_Accel-Min_Accel) - (MAX_EFFORT*AccelToScale)/(Max_Accel-Min_Accel);
 	}
 }
 

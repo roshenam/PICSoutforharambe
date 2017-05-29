@@ -4,7 +4,9 @@
 // Public Function Prototypes
 
 void Init_Accel(void);
-uint8_t Get_AccelRL( void );
-uint8_t Get_AccelFB( void );
+uint8_t Get_AccelTail( void );
+uint8_t Get_AccelHead( void );
+uint8_t Get_FB( void );
+uint8_t Get_RL( void );
 
 #endif 
