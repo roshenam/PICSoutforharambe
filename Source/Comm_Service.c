@@ -185,6 +185,7 @@ static void ConstructPacket(uint8_t PacketType) {
 							//add the packet type
 							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_REQ_2_PAIR;
 							RunningSum += FARMER_DOG_REQ_2_PAIR;
+							printf("Header is %d\r\n",DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX]);
 						
 							//get data
 							uint8_t DogTag = GetDogTag();
@@ -216,6 +217,7 @@ static void ConstructPacket(uint8_t PacketType) {
 							//add the packet type
 							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_ENCR_KEY;
 							RunningSum += FARMER_DOG_ENCR_KEY;
+						  printf("Header is %d\r\n",DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX]); 
 							
 							// get data (encryption key)
 							DataToSend = GetEncryptionKey();
@@ -252,6 +254,7 @@ static void ConstructPacket(uint8_t PacketType) {
 						
 							//encrypt + add the packet type
 							DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX] = FARMER_DOG_CTRL^(*(EncryptionData + EncryptionIndex));
+						 printf("Header is %d\r\n",DataPacket_Tx[PACKET_TYPE_BYTE_INDEX_TX]);
 							RunningSum += FARMER_DOG_CTRL^(*(EncryptionData + EncryptionIndex));
 							// increment encryption index
 							EncryptionIndex++;
@@ -283,6 +286,7 @@ static void ConstructPacket(uint8_t PacketType) {
 					NewEvent.EventType = ES_START_XMIT;
 					//Post NewEvent to transmit service
 					PostTransmit_SM(NewEvent);
+					
 }
 
 /****************************************************************************
@@ -311,7 +315,8 @@ static void InterpretPacket(uint8_t SizeOfData) {
 					// get IMU data
 					for (int i = 0; i < 12; i++ ) {
 						IMU_Data[i] = *(DataPacket_Rx + PACKET_TYPE_BYTE_INDEX_RX + i + 1); // IMU data starts AFTER packet type byte
-						//printf("IMU data: %i\r\n", IMU_Data[i]);
+						printf("IMU data: %i\r\n", IMU_Data[i]);
+						//printf("Dog_Farmer_Report\r\n");
 					}
 					break;
 				case DOG_ACK :
@@ -320,10 +325,11 @@ static void InterpretPacket(uint8_t SizeOfData) {
 					// save source address to destination address)
 					DestMSB = *(DataPacket_Rx + SOURCE_ADDRESS_MSB_INDEX);
 					DestLSB = *(DataPacket_Rx + SOURCE_ADDRESS_LSB_INDEX);
-				
+					printf("Dog Ack\r\n");
 					break;
 				case DOG_FARMER_RESET_ENCR :
 					NewEvent.EventType = ES_DOG_RESET_ENCR_RECEIVED;
+				printf("Dog farmer reset encr\r\n");
 					break;
 			}
 			NewEvent.EventParam = SizeOfData; //the frame length

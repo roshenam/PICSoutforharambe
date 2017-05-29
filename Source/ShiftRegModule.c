@@ -87,7 +87,7 @@ uint8_t SR_GetCurrentRegister(void){
 
 // Create your own function header comment
 void SR_Write(uint8_t NewValue){
-  uint8_t BitCounter;
+  //uint8_t BitCounter;
   LocalRegisterImage = NewValue; // save a local copy
 
 	// lower the register clock
@@ -95,7 +95,7 @@ void SR_Write(uint8_t NewValue){
 	
 	// for loop: shift out the data while pulsing the serial clock  
 	for (int i = 0; i<8; i++) {
-		printf("%i\r\n",i);
+		//printf("%i\r\n",i);
 		// Isolate the MSB of NewValue, put it into the LSB position and output
 		if((NewValue & BIT7HI) != 0) {//MSB is high
 			HWREG(GPIO_PORTB_BASE + GPIO_O_DATA+ALL_BITS) |= DATA; //set DATA line high 
@@ -115,6 +115,7 @@ void SR_Write(uint8_t NewValue){
 }
 
 
+
 // Test harness for shift register functions
 /*#ifdef TEST
 int main(void){
@@ -127,3 +128,4 @@ int main(void){
 	return 0;
 }
 #endif*/
+

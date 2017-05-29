@@ -30,7 +30,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 5
+#define NUM_SERVICES 6
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -106,11 +106,11 @@
 // These are the definitions for Service 5
 #if NUM_SERVICES > 5
 // the header file with the public function prototypes
-#define SERV_5_HEADER "TestHarnessService5.h"
+#define SERV_5_HEADER "Nose_SM.h"
 // the name of the Init function
-#define SERV_5_INIT InitTestHarnessService5
+#define SERV_5_INIT InitNose_SM
 // the name of the run function
-#define SERV_5_RUN RunTestHarnessService5
+#define SERV_5_RUN RunNose_SM
 // How big should this services Queue be?
 #define SERV_5_QUEUE_SIZE 3
 #endif
@@ -269,7 +269,10 @@ typedef enum {  ES_NO_EVENT = 0,
 								// Touch button debounce events
 								TOUCHBUTTON_UP,
 								TOUCHBUTTON_DOWN,
-								DB_TOUCHBUTTONUP
+								DB_TOUCHBUTTONUP,
+								NOSEBUTTON_UP,
+								NOSEBUTTON_DOWN,
+								TOGGLE_PERIPHERAL
 								
 				} ES_EventTyp_t ;
 
@@ -309,7 +312,7 @@ typedef enum {  ES_NO_EVENT = 0,
 
 /****************************************************************************/
 // This is the list of event checking functions 
-#define EVENT_CHECK_LIST Check4Keystroke, CheckTouchButton
+#define EVENT_CHECK_LIST Check4Keystroke, CheckTouchButton, CheckNoseButton
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -324,7 +327,7 @@ typedef enum {  ES_NO_EVENT = 0,
 #define TIMER3_RESP_FUNC PostFARMER_SM
 #define TIMER4_RESP_FUNC PostFARMER_SM
 #define TIMER5_RESP_FUNC PostTouch_SM
-#define TIMER6_RESP_FUNC TIMER_UNUSED
+#define TIMER6_RESP_FUNC PostNose_SM
 #define TIMER7_RESP_FUNC TIMER_UNUSED
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
@@ -348,5 +351,6 @@ typedef enum {  ES_NO_EVENT = 0,
 #define INTER_MESSAGE_TIMER 3
 #define LOST_COMM_TIMER	4
 #define TOUCHDEBOUNCE_TIMER 5
+#define NOSEDEBOUNCE_TIMER 6
 
 #endif /* CONFIGURE_H */

@@ -24,6 +24,7 @@
 
 bool Check4Keystroke(void);
 bool CheckTouchButton(void);
+bool CheckNoseButton(void);
 
 
 #endif /* EventCheckers_H */

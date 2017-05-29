@@ -50,9 +50,15 @@
 #define TOUCHBUTTON_LO BIT4LO
 #define TOUCHBUTTON_HI BIT4HI
 
+// Peripheral button on PB5
+#define NOSEBUTTON GPIO_PIN_5
+#define NOSEBUTTON_LO BIT5LO
+#define NOSEBUTTON_HI BIT5HI
+
 #define ALL_BITS (0xff<<2)
 
 static uint8_t LastButtonState = 0;
+static uint8_t LastNoseState = 0;
 
 /****************************************************************************
  Function
@@ -146,4 +152,46 @@ bool CheckTouchButton (void) {
 		LastButtonState = CurrentButtonState;
 		return ReturnVal;
 }
+
+/****************************************************************************
+ Function
+   CheckNoseButton
+ Parameters
+   None
+ Returns
+   bool: true if a new event was posted
+ Description
+   Event checker for the Nose_SM service that detects rises and falls 
+	 in the input pin for the nose button
+
+ Author
+ R. MacPherson, 5/21/17
+****************************************************************************/
+bool CheckNoseButton (void) {
+	
+	// Local variables
+	bool ReturnVal = false;
+	uint8_t CurrentNoseState;
+	uint16_t CurrTime = ES_Timer_GetTime();
+	// Get the CurrentButtonState from the input line
+	CurrentNoseState = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & NOSEBUTTON_HI );
+	//printf("reset button state is %d\r\n",CurrentButtonState);
+	// If the state of the Button input line has changed
+	if ( CurrentNoseState != LastNoseState ){
+		ES_Event ThisEvent;
+		ThisEvent.EventParam = CurrTime;
+		// If the current state of the input line is high
+		if ( CurrentNoseState == NOSEBUTTON_HI ){
+			// PostEvent ResetButtonUp with parameter of the Current Time
+    		ThisEvent.EventType = NOSEBUTTON_UP;}
+		else{
+			ThisEvent.EventType = NOSEBUTTON_DOWN;}
+		
+		PostNose_SM(ThisEvent); 	
+    ReturnVal = true; }
+		//printf("reset button event checker\r\n");
+		LastNoseState = CurrentNoseState;
+		return ReturnVal;
+}
+
 

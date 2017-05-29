@@ -48,9 +48,9 @@ static uint8_t EncryptionKey[NUM_ENCRYPTION_BYTES]; // array of 32 encryption ke
 
 static uint8_t DogTag = 0x01;
 
-static uint16_t GameTimerLength;
+//static uint16_t GameTimerLength;
 
-static uint8_t LastPeriphState;
+//static uint8_t LastPeriphState;
 
 static bool Send_Pair = true;
 
@@ -64,7 +64,9 @@ static uint8_t LED_values[8] = {BIT0HI, (BIT0HI | BIT1HI), (BIT0HI | BIT1HI | BI
 																(BIT0HI | BIT1HI | BIT2HI | BIT3HI | BIT4HI | BIT5HI),
 																(BIT0HI | BIT1HI | BIT2HI | BIT3HI | BIT4HI | BIT5HI | BIT6HI), 0xff};
 
-static uint16_t IMU_ranges[7] = {500, 1000, 1500, 2000, 2500, 3000, 3500};
+static uint16_t IMU_ranges[7] = {700, 1490, 2100, 2800, 3500, 4200, 4900};
+
+static bool Toggle_Periph = false;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -116,7 +118,7 @@ bool InitFARMER_SM ( uint8_t Priority )
 	HWREG( GPIO_PORTB_BASE + GPIO_O_DEN ) |= ( PERIPHERAL_PIN );
 	HWREG( GPIO_PORTB_BASE + GPIO_O_DIR ) &= ~(PERIPHERAL_PIN) ;
 	//Initialize peripheral value to whatever it starts out as
-	LastPeriphState = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & PERIPHERAL_PIN );
+	//LastPeriphState = ( HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS )) & PERIPHERAL_PIN );
 	
 	// Initialize brake pin (input)
 	HWREG(SYSCTL_RCGCGPIO) |= SYSCTL_RCGCGPIO_R0;
@@ -218,6 +220,9 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				printf("the state of the tongue button is %d\r\n",periph);
 				printf("the dog tag is %d\r\n",DogState);
 			}
+			if( ThisEvent.EventType == TOGGLE_PERIPHERAL ){
+				printf("Nose button down\r\n");
+			}
 				
 		break;
 			
@@ -256,6 +261,8 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				printf("UNPAIRED\r\n");
 				//if there is ever a place where we want to unpair, send this event to farmer_sm
 				//most likeley for debugging - add in a key-press event that sends this event
+				Eyes_Off();
+				SR_Write( 0 );
 				CurrentState = Wait2Pair;
 			}
 			
@@ -263,6 +270,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				printf("Lost communication, No ACK\r\n");
 				
 				Eyes_Off();
+				SR_Write( 0 );
 				
 				// go back to Wait2Pair state
 				CurrentState = Wait2Pair;
@@ -281,7 +289,6 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				NewEvent.EventType = ES_SENDPACKET;
 				NewEvent.EventParam = FARMER_DOG_ENCR_KEY;
 				PostComm_Service(NewEvent);
-				
 				// set encryption index to zero
 				ResetEncryptionIndex();
 				
@@ -289,7 +296,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
 				
 				// start INTER_MESSAGE timer
-				ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
+				//ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
 				
 				// start GameTimer
 				//ES_Timer_InitTimer(GAME_TIMER, 10000);
@@ -298,17 +305,65 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				Send_Pair = false;
 				
 				// go to Paired state
-				CurrentState = Paired;
+				CurrentState = Paired_Wait4Status;
 			}
 		
     break;
 
+		case Paired_Wait4Status: 
+			
+		if ( ThisEvent.EventType == ES_DOG_REPORT_RECEIVED ) {
+			
+			// send a CTRL packet
+			ES_Event NewEvent;
+			NewEvent.EventType = ES_SENDPACKET;
+			NewEvent.EventParam = FARMER_DOG_CTRL;
+			PostComm_Service(NewEvent);		
+			
+			// start INTER_MESSAGE timer
+			ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
+			printf("got status report from dog\r\n");
+			CurrentState = Paired;
+		}
+			if (ThisEvent.EventType == ES_UNPAIR) {
+				printf("UNPAIRED\r\n");
+				
+				Eyes_Off();
+				SR_Write( 0 );
+				
+				// switch Pair bool state 
+				Send_Pair = true;
+				
+				//if there is ever a place where we want to unpair, send this event to farmer_sm
+				//most likeley for debugging - add in a key-press event that sends this event
+				CurrentState = Wait2Pair;
+			}
+			if ( ThisEvent.EventType == ES_TIMEOUT && ThisEvent.EventParam == LOST_COMM_TIMER ) {
+				printf("Lost communication\r\n");
+				
+				Eyes_Off();
+				SR_Write( 0 );
+				
+				// switch Pair bool state 
+				Send_Pair = true;
+				
+				// go back to Wait2Pair state
+				CurrentState = Wait2Pair;
+			}
+		
+		break;
+			
 		case Paired:      
+			
+			if (ThisEvent.EventType == TOGGLE_PERIPHERAL){
+				//flip peripheral toggle flag
+				Toggle_Periph = true;}
 			
 			if (ThisEvent.EventType == ES_UNPAIR) {
 				printf("UNPAIRED\r\n");
 				
 				Eyes_Off();
+				SR_Write( 0 );
 				
 				// switch Pair bool state 
 				Send_Pair = true;
@@ -322,6 +377,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				printf("GAME OVER\r\n");
 				
 				Eyes_Off();
+				SR_Write( 0 );
 
 				// switch Pair bool state 
 				Send_Pair = true;
@@ -334,6 +390,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				printf("Lost communication\r\n");
 				
 				Eyes_Off();
+				SR_Write( 0 );
 				
 				// switch Pair bool state 
 				Send_Pair = true;
@@ -441,9 +498,9 @@ uint8_t GetDogTag(void) {
 	DogLine1 = ( HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & DOGSEL1 );
 	DogLine2 = ( HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & DOGSEL2 );
 	if( DogLine1 ){
-		//DogTag = 0x01;
+		DogTag = 0x01;
 		//DogTag = 26;
-		DogTag = 39;
+		//DogTag = 39;
 		printf("Dog Tag is %d\r\n",DogTag);
 		//DogTag = 4;
 	}
@@ -462,7 +519,7 @@ uint8_t GetDogTag(void) {
 
 uint8_t* GetSensorData(void) {
 	static uint8_t Data[3];
-	static uint8_t CurrPeriphState;
+	//static uint8_t CurrPeriphState;
 	Data[0] = Get_AccelFB();
 	Data[1] = Get_AccelRL();
 	
@@ -470,13 +527,19 @@ uint8_t* GetSensorData(void) {
 	uint8_t DigitalByte = 0;
 	
 	// read peripheral pin (tongue switch, PB5)
-	CurrPeriphState = (HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) & PERIPHERAL_PIN);
+	/*CurrPeriphState = (HWREG(GPIO_PORTB_BASE + ( GPIO_O_DATA + ALL_BITS) ) & PERIPHERAL_PIN);
 	if (CurrPeriphState == LastPeriphState){ // if pin has not changed
 	}
 	else{
 		DigitalByte |= BIT0HI;
 	} 
-	LastPeriphState = CurrPeriphState;
+	LastPeriphState = CurrPeriphState;*/
+	// if the toggle flag is high, set the byte and clear the flag
+	if( Toggle_Periph ){
+		DigitalByte |= BIT0HI;
+		Toggle_Periph = false;
+	}
+	// otherwise do nothing
 	
 	// read brake pin (green button, PA2)
 	if ( (HWREG( GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS) ) & BRAKE_PIN) == 0) { // if pin is LOW (switch pressed)
@@ -524,7 +587,6 @@ static uint8_t IMU2LED( uint8_t* IMU_address ){
 		return LED_values[6];
 	else
 		return LED_values[7];
-
 }
 
 

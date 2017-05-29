@@ -573,6 +573,11 @@
               <FileType>1</FileType>
               <FilePath>.\Source\EnablePA25_PB23_PD7_PF0.c</FilePath>
             </File>
+            <File>
+              <FileName>Nose_SM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Source\Nose_SM.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -742,6 +747,11 @@
               <FileName>ShiftRegModule.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Headers\ShiftRegModule.h</FilePath>
+            </File>
+            <File>
+              <FileName>Nose_SM.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Headers\Nose_SM.h</FilePath>
             </File>
           </Files>
         </Group>
