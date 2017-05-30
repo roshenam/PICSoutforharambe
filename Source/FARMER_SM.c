@@ -304,7 +304,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				ES_Timer_InitTimer(LOST_COMM_TIMER, LOST_COMM_TIME);
 				
 				// start INTER_MESSAGE timer
-				//ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
+				ES_Timer_InitTimer(INTER_MESSAGE_TIMER, INTER_MESSAGE_TIME);
 				
 				// start GameTimer
 				//ES_Timer_InitTimer(GAME_TIMER, 10000);
@@ -313,12 +313,12 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				Send_Pair = false;
 				
 				// go to Paired state
-				CurrentState = Paired_Wait4Status;
+				CurrentState = Paired;
 			}
 		
     break;
 
-		case Paired_Wait4Status: 
+		/*case Paired_Wait4Status: 
 			
 		if ( ThisEvent.EventType == ES_DOG_REPORT_RECEIVED ) {
 			
@@ -359,7 +359,7 @@ ES_Event RunFARMER_SM( ES_Event ThisEvent )
 				CurrentState = Wait2Pair;
 			}
 		
-		break;
+		break;*/
 			
 		case Paired:      
 			
@@ -508,8 +508,8 @@ uint8_t GetDogTag(void) {
 	if( DogLine1 ){
 		//DogTag = 0x01;
 		//DogTag = 26;
-		//DogTag = 39;
-		DogTag = 50;
+		DogTag = 39;
+		//DogTag = 50;
 		printf("Dog Tag is %d\r\n",DogTag);
 		//DogTag = 4;
 	}
@@ -521,8 +521,8 @@ uint8_t GetDogTag(void) {
 	}
 	else{
 		//DogTag = 0x02;
-		//DogTag = 2;
-		DogTag = 101;
+		DogTag = 2;
+		//DogTag = 101;
 		printf("Dog Tag is 2\r\n");
 		//DogTag = 4;
 	}

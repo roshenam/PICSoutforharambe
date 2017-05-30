@@ -5,7 +5,7 @@
 #include "ES_Types.h"
 #include "ES_Events.h"
 
-typedef enum { Wait2Pair, Wait4PairResponse, Paired_Wait4Status, Paired, Debug} FARMERState_t ;
+typedef enum { Wait2Pair, Wait4PairResponse, Paired, Debug} FARMERState_t ;
 
 uint8_t* GetEncryptionKey(void);
 uint8_t GetDogTag(void);
