@@ -506,19 +506,23 @@ uint8_t GetDogTag(void) {
 	DogLine1 = ( HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & DOGSEL1 );
 	DogLine2 = ( HWREG(GPIO_PORTA_BASE + ( GPIO_O_DATA + ALL_BITS )) & DOGSEL2 );
 	if( DogLine1 ){
-		DogTag = 0x01;
+		//DogTag = 0x01;
 		//DogTag = 26;
 		//DogTag = 39;
+		DogTag = 50;
 		printf("Dog Tag is %d\r\n",DogTag);
 		//DogTag = 4;
 	}
 	else if( DogLine2 ){
-		DogTag = 0x03;
+		DogTag = 3;
+		//DogTag = 39;
 		printf("Dog Tag is 3\r\n");
 		//DogTag = 4;
 	}
 	else{
-		DogTag = 0x02;
+		//DogTag = 0x02;
+		//DogTag = 2;
+		DogTag = 101;
 		printf("Dog Tag is 2\r\n");
 		//DogTag = 4;
 	}

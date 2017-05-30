@@ -88,7 +88,7 @@ uint8_t Get_AccelTail( void )
 	
 	// Do scaling fro 0-255
 	Tail_Effort = Scale_Accel(ADResults[ACCELRL_PIN], TAIL);
-	printf("RL value is %d, scaled is %d\r\n",Tail_Effort, ADResults[ACCELRL_PIN]);
+	//printf("RL value is %d, scaled is %d\r\n",Tail_Effort, ADResults[ACCELRL_PIN]);
 	return Tail_Effort;
 }
 
@@ -115,7 +115,7 @@ uint8_t Get_AccelHead( void )
 	
 	// Do scaling from 0-255
 	Head_Effort = Scale_Accel(ADResults[ACCELFB_PIN], HEAD);
-	printf("FB value is %d, unscaled is %d\r\n",Head_Effort, ADResults[ACCELFB_PIN]);
+	//printf("FB value is %d, unscaled is %d\r\n",Head_Effort, ADResults[ACCELFB_PIN]);
 	return Head_Effort;
 }
 
@@ -141,7 +141,7 @@ uint8_t Get_FB( void )
 	uint8_t Left = Get_AccelHead();
 	uint8_t Right = Get_AccelTail();
 
-	printf("Mean is %d\r\n",((Left/2) + (Right/2)));
+	//printf("Mean is %d\r\n",((Left/2) + (Right/2)));
 	return ((Left/2) + (Right/2));
 }
 
@@ -169,7 +169,7 @@ uint8_t Get_RL( void )
 
 	int Delta = Left-Right;
 	
-	printf("LR is %d\r\n",(Delta*MAX_EFFORT/(2*MAX_EFFORT) + MIDDLE));
+	//printf("LR is %d\r\n",(Delta*MAX_EFFORT/(2*MAX_EFFORT) + MIDDLE));
 	return (Delta*MAX_EFFORT/(2*MAX_EFFORT) + MIDDLE);
 }
 

@@ -42,7 +42,7 @@ static uint8_t EncryptionIndex;
 static uint8_t IMU_Data[12];
 static uint8_t DestMSB;
 static uint8_t DestLSB;
-
+static uint8_t DataFrameLength_Tx;
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
  Function
@@ -197,8 +197,9 @@ static void ConstructPacket(uint8_t PacketType) {
 							// calculate and add check sum
 							CheckSum = 0xFF - RunningSum;
 							DataPacket_Tx[DATA_BYTE_INDEX_TX+1] = CheckSum;
-						
+							
 						  //set the frame length as event param
+							DataFrameLength_Tx = REQ_2_PAIR_LENGTH;
 							NewEvent.EventParam = REQ_2_PAIR_LENGTH;						
 							break;
 							
@@ -233,6 +234,7 @@ static void ConstructPacket(uint8_t PacketType) {
 							DataPacket_Tx[DATA_BYTE_INDEX_TX + 32] = CheckSum;
 						
 						  //set the frame length as event param
+							DataFrameLength_Tx = ENCR_KEY_LENGTH;
 							NewEvent.EventParam = ENCR_KEY_LENGTH;	
 							break;
 							
@@ -279,6 +281,7 @@ static void ConstructPacket(uint8_t PacketType) {
 							DataPacket_Tx[DATA_BYTE_INDEX_TX + 3] = CheckSum; 
 						
 						  //set the frame length as event param
+							DataFrameLength_Tx = CTRL_LENGTH;
 							NewEvent.EventParam = CTRL_LENGTH;	
 							break;
 					}
@@ -342,6 +345,10 @@ static void InterpretPacket(uint8_t SizeOfData) {
 			} else {
 				printf("FAILURE\n\r");
 				//RESEND THE TX DATA PACKET -- ADD CODE IN HERE
+							ES_Event NewEvent;
+							NewEvent.EventType = ES_START_XMIT;
+							NewEvent.EventParam = DataFrameLength_Tx;
+							PostTransmit_SM(NewEvent);
 			}
 		} else if (API_Ident == API_IDENTIFIER_Reset) {
 			printf("Hardware Reset Status Message \n\r");
